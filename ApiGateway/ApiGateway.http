@@ -1,6 +1,85 @@
 @ApiGateway_HostAddress = http://localhost:5092
 
-GET {{ApiGateway_HostAddress}}/weatherforecast/
+### Health Check - Basic
+GET {{ApiGateway_HostAddress}}/health
+Accept: application/json
+
+### Health Check - API Controller
+GET {{ApiGateway_HostAddress}}/api/health
+Accept: application/json
+
+### Health Check - Detailed
+GET {{ApiGateway_HostAddress}}/api/health/detailed
+Accept: application/json
+
+###
+# ============================================
+# USER SERVICE via API Gateway
+# ============================================
+
+### Get All Users
+GET {{ApiGateway_HostAddress}}/user-service/api/users
+Accept: application/json
+
+### Get User by ID
+GET {{ApiGateway_HostAddress}}/user-service/api/users/1
+Accept: application/json
+
+### Get User by Username
+GET {{ApiGateway_HostAddress}}/user-service/api/users/username/john_doe
+Accept: application/json
+
+### Create New User
+POST {{ApiGateway_HostAddress}}/user-service/api/users
+Content-Type: application/json
+
+{
+  "username": "john_doe",
+  "email": "john@example.com",
+  "password": "SecurePassword123",
+  "fullName": "John Doe",
+  "phoneNumber": "+1234567890"
+}
+
+### Update User
+PUT {{ApiGateway_HostAddress}}/user-service/api/users/1
+Content-Type: application/json
+
+{
+  "email": "john.doe@example.com",
+  "fullName": "John Michael Doe",
+  "phoneNumber": "+1234567899",
+  "isActive": true
+}
+
+### Delete User
+DELETE {{ApiGateway_HostAddress}}/user-service/api/users/1
+
+###
+# ============================================
+# ORDER SERVICE via API Gateway (Not implemented yet)
+# ============================================
+
+### Get All Orders (Example - not implemented)
+GET {{ApiGateway_HostAddress}}/order-service/api/orders
+Accept: application/json
+
+###
+# ============================================
+# INVENTORY SERVICE via API Gateway (Not implemented yet)
+# ============================================
+
+### Get All Products (Example - not implemented)
+GET {{ApiGateway_HostAddress}}/inventory-service/api/products
+Accept: application/json
+
+###
+# ============================================
+# PAYMENT SERVICE via API Gateway (Not implemented yet)
+# ============================================
+
+### Get All Payments (Example - not implemented)
+GET {{ApiGateway_HostAddress}}/payment-service/api/payments
 Accept: application/json
 
 ###

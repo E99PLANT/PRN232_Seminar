@@ -1,11 +1,24 @@
+using Microsoft.EntityFrameworkCore;
+using UserService.Application.Interfaces;
+using UserService.Application.Services;
+using UserService.Domain.Interfaces;
+using UserService.Infrastructure.Data;
+using UserService.Infrastructure.Repositories;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-
 builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+// Database Configuration
+builder.Services.AddDbContext<UserDbContext>(options =>
+    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+// Dependency Injection
+builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IUserService, UserAppService>();
 
 var app = builder.Build();
 

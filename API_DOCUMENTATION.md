@@ -18,7 +18,15 @@ Client → API Gateway (port 5092) → Route đến Service phù hợp
 
 ---
 
-## 📖 Swagger UI — Test API trực tiếp
+## 📖 Swagger UI — Test API
+
+### ⭐ Swagger Tổng Hợp (Tất cả service trong 1 trang)
+
+> **http://14.225.207.221:5092/swagger**
+>
+> Có dropdown chọn từng service: Payment, User, Inventory, Order
+
+### Swagger Riêng Từng Service (dùng khi cần debug)
 
 | Service | Swagger URL |
 |---------|-------------|

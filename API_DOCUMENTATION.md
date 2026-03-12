@@ -31,11 +31,7 @@ Client → API Gateway (port 5092) → Route đến Service phù hợp
 
 ## 🚪 API Gateway — Cổng Vào Chung (port 5092)
 
-Tất cả request đều đi qua API Gateway, format:
-
-```
-http://14.225.207.221:5092/{tên-service}/api/{endpoint}
-```
+Base URL: `http://14.225.207.221:5092`
 
 ---
 
@@ -43,14 +39,14 @@ http://14.225.207.221:5092/{tên-service}/api/{endpoint}
 
 **Schema**: `khanh_wallet` trên Supabase
 
-| Chức năng | Method | Endpoint |
+| Chức năng | Method | Full URL |
 |-----------|--------|----------|
-| Tạo Account + Wallet | `POST` | `/payment-service/api/khanh-wallet/accounts` |
-| Xem thông tin Wallet | `GET` | `/payment-service/api/khanh-wallet/accounts/{accountId}` |
-| Nạp tiền | `POST` | `/payment-service/api/khanh-wallet/deposit` |
-| Rút tiền | `POST` | `/payment-service/api/khanh-wallet/withdraw` |
-| Lịch sử giao dịch | `GET` | `/payment-service/api/khanh-wallet/transactions/{walletId}` |
-| **Tra cứu bất thường** | `GET` | `/payment-service/api/khanh-wallet/suspicious` |
+| Tạo Account + Wallet | `POST` | `http://14.225.207.221:5092/payment-service/api/khanh-wallet/accounts` |
+| Xem thông tin Wallet | `GET` | `http://14.225.207.221:5092/payment-service/api/khanh-wallet/accounts/{accountId}` |
+| Nạp tiền | `POST` | `http://14.225.207.221:5092/payment-service/api/khanh-wallet/deposit` |
+| Rút tiền | `POST` | `http://14.225.207.221:5092/payment-service/api/khanh-wallet/withdraw` |
+| Lịch sử giao dịch | `GET` | `http://14.225.207.221:5092/payment-service/api/khanh-wallet/transactions/{walletId}` |
+| **Tra cứu bất thường** | `GET` | `http://14.225.207.221:5092/payment-service/api/khanh-wallet/suspicious` |
 
 #### Body mẫu — Tạo Account:
 ```json
@@ -81,13 +77,13 @@ http://14.225.207.221:5092/{tên-service}/api/{endpoint}
 
 ### 👤 UserService
 
-| Chức năng | Method | Endpoint |
+| Chức năng | Method | Full URL |
 |-----------|--------|----------|
-| Danh sách users | `GET` | `/user-service/api/users` |
-| Xem user | `GET` | `/user-service/api/users/{id}` |
-| Tạo user | `POST` | `/user-service/api/users` |
-| Cập nhật user | `PUT` | `/user-service/api/users/{id}` |
-| Xóa user | `DELETE` | `/user-service/api/users/{id}` |
+| Danh sách users | `GET` | `http://14.225.207.221:5092/user-service/api/users` |
+| Xem user theo ID | `GET` | `http://14.225.207.221:5092/user-service/api/users/{id}` |
+| Tạo user | `POST` | `http://14.225.207.221:5092/user-service/api/users` |
+| Cập nhật user | `PUT` | `http://14.225.207.221:5092/user-service/api/users/{id}` |
+| Xóa user | `DELETE` | `http://14.225.207.221:5092/user-service/api/users/{id}` |
 
 ---
 
@@ -95,18 +91,18 @@ http://14.225.207.221:5092/{tên-service}/api/{endpoint}
 
 **Schema**: `danh_inventory` trên Supabase
 
-| Chức năng | Method | Endpoint |
+| Chức năng | Method | Full URL |
 |-----------|--------|----------|
-| Xem tồn kho | `GET` | `/inventory-service/api/danh-inventory/stock/{productId}` |
-| Nhập kho | `POST` | `/inventory-service/api/danh-inventory/import` |
-| Simulate order | `POST` | `/inventory-service/api/danh-inventory/simulate-order` |
-| Xem event history | `GET` | `/inventory-service/api/danh-inventory/events/{aggregateId}` |
+| Xem tồn kho | `GET` | `http://14.225.207.221:5092/inventory-service/api/danh-inventory/stock/{productId}` |
+| Nhập kho | `POST` | `http://14.225.207.221:5092/inventory-service/api/danh-inventory/import` |
+| Simulate order | `POST` | `http://14.225.207.221:5092/inventory-service/api/danh-inventory/simulate-order` |
+| Xem event history | `GET` | `http://14.225.207.221:5092/inventory-service/api/danh-inventory/events/{aggregateId}` |
 
 ---
 
 ### 🛒 OrderService
 
-> ⚠️ Đang chờ dev khác implement. Dockerfile và Docker Compose đã sẵn sàng.
+> ⚠️ Đang chờ dev khác implement. Dockerfile và Docker Compose đã sẵn sàng trên port `5267`.
 
 ---
 

@@ -7,7 +7,8 @@ var builder = WebApplication.CreateBuilder(args);
 // Add Ocelot configuration
 // Docker dùng ocelot.docker.json (routing qua container name)
 // Local dùng ocelot.json (routing qua localhost)
-var ocelotFile = builder.Environment.IsProduction() ? "ocelot.docker.json" : "ocelot.json";
+var isDocker = Environment.GetEnvironmentVariable("DOCKER_ENV") == "true";
+var ocelotFile = isDocker ? "ocelot.docker.json" : "ocelot.json";
 builder.Configuration.AddJsonFile(ocelotFile, optional: false, reloadOnChange: true);
 
 // Add services to the container.

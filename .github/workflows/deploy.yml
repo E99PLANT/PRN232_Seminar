@@ -18,7 +18,7 @@ jobs:
           script: |
             cd /opt/prn232-seminar
             git pull origin main
-            docker compose down
-            docker compose up --build -d
+            docker-compose down
+            docker-compose up --build -d
             docker image prune -f
             echo "Deploy completed at $(date)"

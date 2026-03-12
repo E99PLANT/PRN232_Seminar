@@ -1,0 +1,65 @@
+services:
+  # === API Gateway ===
+  api-gateway:
+    build:
+      context: ./ApiGateway
+      dockerfile: Dockerfile
+    container_name: prn232-api-gateway
+    ports:
+      - "5092:8080"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+    depends_on:
+      - user-service
+      - inventory-service
+      - payment-service
+    networks:
+      - prn232-network
+    restart: unless-stopped
+
+  # === User Service ===
+  user-service:
+    build:
+      context: ./UserService
+      dockerfile: Dockerfile
+    container_name: prn232-user-service
+    ports:
+      - "5209:8080"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - ConnectionStrings__DefaultConnection=Host=localhost;Port=5432;Database=UserServiceDb;Username=postgres;Password=postgres
+    networks:
+      - prn232-network
+    restart: unless-stopped
+
+  # === Inventory Service ===
+  inventory-service:
+    build:
+      context: ./InventoryService
+      dockerfile: Dockerfile
+    container_name: prn232-inventory-service
+    ports:
+      - "5254:8080"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+    networks:
+      - prn232-network
+    restart: unless-stopped
+
+  # === Payment Service (Wallet) ===
+  payment-service:
+    build:
+      context: ./PaymentService
+      dockerfile: Dockerfile
+    container_name: prn232-payment-service
+    ports:
+      - "5253:8080"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+    networks:
+      - prn232-network
+    restart: unless-stopped
+
+networks:
+  prn232-network:
+    driver: bridge

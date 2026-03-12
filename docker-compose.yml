@@ -12,6 +12,7 @@ services:
       - DOCKER_ENV=true
     depends_on:
       - user-service
+      - order-service
       - inventory-service
       - payment-service
     networks:
@@ -26,6 +27,20 @@ services:
     container_name: prn232-user-service
     ports:
       - "5209:8080"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+    networks:
+      - prn232-network
+    restart: unless-stopped
+
+  # === Order Service ===
+  order-service:
+    build:
+      context: ./OrderService
+      dockerfile: Dockerfile
+    container_name: prn232-order-service
+    ports:
+      - "5267:8080"
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
     networks:

@@ -1,9 +1,23 @@
 services:
+  # === RabbitMQ (Message Queue) ===
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: prn232-rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      - RABBITMQ_DEFAULT_USER=guest
+      - RABBITMQ_DEFAULT_PASS=guest
+    networks:
+      - prn232-network
+    restart: unless-stopped
+
   # === API Gateway ===
   api-gateway:
     build:
-      context: ./ApiGateway
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: ApiGateway/Dockerfile
     container_name: prn232-api-gateway
     ports:
       - "5092:8080"
@@ -22,8 +36,8 @@ services:
   # === User Service ===
   user-service:
     build:
-      context: ./UserService
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: UserService/Dockerfile
     container_name: prn232-user-service
     ports:
       - "5209:8080"
@@ -36,13 +50,16 @@ services:
   # === Order Service ===
   order-service:
     build:
-      context: ./OrderService
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: OrderService/Dockerfile
     container_name: prn232-order-service
     ports:
       - "5267:8080"
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
+      - RabbitMQ__Host=rabbitmq
+    depends_on:
+      - rabbitmq
     networks:
       - prn232-network
     restart: unless-stopped
@@ -50,13 +67,16 @@ services:
   # === Inventory Service ===
   inventory-service:
     build:
-      context: ./InventoryService
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: InventoryService/Dockerfile
     container_name: prn232-inventory-service
     ports:
       - "5254:8080"
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
+      - RabbitMQ__Host=rabbitmq
+    depends_on:
+      - rabbitmq
     networks:
       - prn232-network
     restart: unless-stopped
@@ -64,8 +84,8 @@ services:
   # === Payment Service (Wallet) ===
   payment-service:
     build:
-      context: ./PaymentService
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: PaymentService/Dockerfile
     container_name: prn232-payment-service
     ports:
       - "5253:8080"

@@ -292,11 +292,8 @@ public class WalletAppService : IWalletAppService
 
         foreach (var e in events)
         {
-            // Tính lại hash từ dữ liệu hiện tại
-            var raw = $"{e.PreviousHash}|{e.EventType}|{e.EventData}|{e.Timestamp:O}";
-            var expectedHash = Convert.ToHexString(
-                System.Security.Cryptography.SHA256.HashData(
-                    System.Text.Encoding.UTF8.GetBytes(raw)));
+            // Tính lại hash từ dữ liệu hiện tại (dùng cùng thuật toán với Repository)
+            var expectedHash = Infrastructure.Repositories.WalletRepository.ComputeHash(e);
 
             bool hashValid = e.Hash == expectedHash;
             bool chainValid = e.PreviousHash == previousHash;

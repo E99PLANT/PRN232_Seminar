@@ -102,6 +102,11 @@ public class WalletRepository : IWalletRepository
 
     public async Task AppendEventAsync(WalletEvent walletEvent)
     {
+        // Truncate timestamp to microseconds (PostgreSQL precision)
+        // để hash trước/sau khi lưu DB luôn giống nhau
+        var ticks = walletEvent.Timestamp.Ticks;
+        walletEvent.Timestamp = new DateTime(ticks - (ticks % 10), walletEvent.Timestamp.Kind);
+
         // Lấy hash của event cuối cùng (nếu có) để tạo chain
         var lastEvent = await _context.WalletEvents
             .Where(e => e.AggregateId == walletEvent.AggregateId)
@@ -116,10 +121,12 @@ public class WalletRepository : IWalletRepository
 
     /// <summary>
     /// Tính SHA256 hash = SHA256(PreviousHash + EventType + EventData + Timestamp)
+    /// Dùng format "yyyy-MM-ddTHH:mm:ss.ffffff" để khớp với PostgreSQL microsecond precision
     /// </summary>
-    private static string ComputeHash(WalletEvent e)
+    public static string ComputeHash(WalletEvent e)
     {
-        var raw = $"{e.PreviousHash}|{e.EventType}|{e.EventData}|{e.Timestamp:O}";
+        var ts = e.Timestamp.ToString("yyyy-MM-ddTHH:mm:ss.ffffffZ");
+        var raw = $"{e.PreviousHash}|{e.EventType}|{e.EventData}|{ts}";
         var bytes = SHA256.HashData(Encoding.UTF8.GetBytes(raw));
         return Convert.ToHexString(bytes);
     }

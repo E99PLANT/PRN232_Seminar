@@ -106,6 +106,26 @@ public class WalletAppService : IWalletAppService
     }
 
     /// <summary>
+    /// Tìm Wallet theo Email
+    /// </summary>
+    public async Task<WalletDto?> GetWalletByEmailAsync(string email)
+    {
+        var account = await _repository.GetAccountByEmailAsync(email);
+        if (account?.Wallet == null) return null;
+
+        return new WalletDto
+        {
+            WalletId = account.Wallet.Id,
+            AccountId = account.Id,
+            Username = account.Username,
+            Email = account.Email,
+            Balance = account.Wallet.Balance,
+            Currency = account.Wallet.Currency,
+            LastUpdated = account.Wallet.LastUpdated
+        };
+    }
+
+    /// <summary>
     /// Xử lý giao dịch: Nạp tiền (Deposit) hoặc Rút tiền (Withdraw)
     /// Tự động kiểm tra và đánh dấu hoạt động bất thường
     /// </summary>

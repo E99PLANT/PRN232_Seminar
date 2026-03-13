@@ -30,6 +30,13 @@ public class WalletRepository : IWalletRepository
             .FirstOrDefaultAsync(a => a.Username == username);
     }
 
+    public async Task<Account?> GetAccountByEmailAsync(string email)
+    {
+        return await _context.Accounts
+            .Include(a => a.Wallet)
+            .FirstOrDefaultAsync(a => a.Email == email);
+    }
+
     public async Task<Account> CreateAccountAsync(Account account)
     {
         await _context.Accounts.AddAsync(account);

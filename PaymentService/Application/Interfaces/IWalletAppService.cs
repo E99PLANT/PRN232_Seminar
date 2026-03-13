@@ -10,6 +10,7 @@ public interface IWalletAppService
     // Xem thông tin Wallet
     Task<WalletDto?> GetWalletByAccountIdAsync(Guid accountId);
     Task<WalletDto?> GetWalletByUsernameAsync(string username);
+    Task<WalletDto?> GetWalletByEmailAsync(string email);
 
     // Thực hiện giao dịch (Nạp/Rút tiền) + tự động kiểm tra bất thường
     Task<TransactionDto> ProcessTransactionAsync(CreateTransactionDto dto);

@@ -59,6 +59,19 @@ public class KhanhWalletController : ControllerBase
     }
 
     /// <summary>
+    /// Tìm Wallet theo Email
+    /// </summary>
+    [HttpGet("accounts/by-email/{email}")]
+    public async Task<IActionResult> GetWalletByEmail(string email)
+    {
+        var result = await _appService.GetWalletByEmailAsync(email);
+        if (result == null)
+            return NotFound(new { Message = $"Không tìm thấy ví cho email: {email}. Có thể user chưa tồn tại hoặc ví chưa được tạo." });
+
+        return Ok(result);
+    }
+
+    /// <summary>
     /// Nạp tiền vào ví (Deposit)
     /// </summary>
     [HttpPost("deposit")]

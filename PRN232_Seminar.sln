@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
-VisualStudioVersion = 17.14.36109.1 d17.14
+VisualStudioVersion = 17.14.36109.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ApiGateway", "ApiGateway\ApiGateway.csproj", "{769E5DF4-7E32-40F3-BD29-AA04508C18C8}"
 EndProject
@@ -12,6 +12,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UserService", "UserService\UserService.csproj", "{35737769-DE7C-49D9-B742-FF7A57CB90C7}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OrderService", "OrderService\OrderService.csproj", "{4A24140B-6F61-4D3B-9436-7710ECB2C451}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PRN232_Seminar.Shared", "PRN232_Seminar.Shared\PRN232_Seminar.Shared.csproj", "{5AF10FEB-4109-48CC-AC24-2B98C2106B92}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -39,6 +41,10 @@ Global
 		{4A24140B-6F61-4D3B-9436-7710ECB2C451}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4A24140B-6F61-4D3B-9436-7710ECB2C451}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4A24140B-6F61-4D3B-9436-7710ECB2C451}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5AF10FEB-4109-48CC-AC24-2B98C2106B92}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5AF10FEB-4109-48CC-AC24-2B98C2106B92}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5AF10FEB-4109-48CC-AC24-2B98C2106B92}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5AF10FEB-4109-48CC-AC24-2B98C2106B92}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -14,6 +14,26 @@ namespace InventoryService.Infrastructure.Repositories
             _context = context;
         }
 
+        // --- CÁC HÀM MỚI ĐƯỢC BỔ SUNG ĐỂ KHỚP VỚI INTERFACE ---
+
+        public async Task<IEnumerable<Inventory>> GetAllAsync()
+        {
+            return await _context.Inventory.ToListAsync();
+        }
+
+        public async Task AddAsync(Inventory inventory)
+        {
+            await _context.Inventory.AddAsync(inventory);
+        }
+
+        public async Task DeleteAsync(Inventory inventory)
+        {
+            _context.Inventory.Remove(inventory);
+            await Task.CompletedTask; // Remove là hàm đồng bộ, ta bọc Task lại cho đúng Interface
+        }
+
+        // --- CÁC HÀM CŨ ĐÃ CÓ ---
+
         public async Task<Inventory?> GetInventoryByProductIdAsync(Guid productId)
         {
             return await _context.Inventory
@@ -30,6 +50,7 @@ namespace InventoryService.Infrastructure.Repositories
             _context.Inventory.Update(inventory);
             await Task.CompletedTask; // Update trong EF là đồng bộ, ta bọc lại bằng Task
         }
+
         public async Task<IEnumerable<InventoryEvent>> GetRecentEventsAsync(int count = 10)
         {
             // Lấy danh sách sự kiện, sắp xếp mới nhất lên đầu

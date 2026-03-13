@@ -1,14 +1,19 @@
-﻿using InventoryService.Application.DTOs;
+﻿using InventoryService.Domain.Entities;
 
 namespace InventoryService.Application.Interfaces
 {
     public interface IInventoryAppService
     {
-        Task HandleOrderCreatedAsync(OrderCreatedEventDto orderEvent);
-        // Lấy số lượng tồn kho hiện tại
-        Task<InventoryService.Domain.Entities.Inventory?> GetStockAsync(Guid productId);
+        // CRUD CƠ BẢN CHO ADMIN
+        Task<IEnumerable<Inventory>> GetAllStockAsync();
+        Task<Inventory?> GetStockAsync(Guid productId);
+        Task<Inventory> ImportStockAsync(Guid productId, string productName, int quantity);
+        Task<bool> DeleteStockAsync(Guid productId);
 
-        // Lấy lịch sử sự kiện
-        Task<IEnumerable<InventoryService.Domain.Entities.InventoryEvent>> GetRecentEventsAsync(int count = 10);
+        // LẤY LỊCH SỬ SỰ KIỆN CHO MÀN HÌNH EVENT MONITOR
+        Task<IEnumerable<InventoryEvent>> GetRecentEventsAsync(int count = 10);
+
+        // XỬ LÝ NGHIỆP VỤ LÕI CỦA SAGA (Gọi từ RabbitMQ Consumer)
+        Task<(bool IsSuccess, string Reason)> ProcessOrderCreatedAsync(Guid orderId, Guid productId, int quantity);
     }
 }

@@ -18,4 +18,7 @@ public interface IWalletAppService
 
     // Tra cứu hoạt động bất thường
     Task<IEnumerable<TransactionDto>> GetSuspiciousTransactionsAsync(int count = 20);
+
+    // Event Sourcing — Xem toàn bộ event history
+    Task<IEnumerable<object>> GetEventsByWalletIdAsync(Guid walletId);
 }

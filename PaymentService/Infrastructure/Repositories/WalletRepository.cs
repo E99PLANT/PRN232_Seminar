@@ -82,6 +82,21 @@ public class WalletRepository : IWalletRepository
             .ToListAsync();
     }
 
+    // === Event Sourcing ===
+
+    public async Task AppendEventAsync(WalletEvent walletEvent)
+    {
+        await _context.WalletEvents.AddAsync(walletEvent);
+    }
+
+    public async Task<IEnumerable<WalletEvent>> GetEventsByWalletIdAsync(Guid walletId)
+    {
+        return await _context.WalletEvents
+            .Where(e => e.AggregateId == walletId)
+            .OrderBy(e => e.Timestamp)
+            .ToListAsync();
+    }
+
     // === Save ===
 
     public async Task SaveChangesAsync()

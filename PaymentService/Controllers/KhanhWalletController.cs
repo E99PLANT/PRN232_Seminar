@@ -122,4 +122,21 @@ public class KhanhWalletController : ControllerBase
             Transactions = result
         });
     }
+
+    /// <summary>
+    /// EVENT SOURCING — Xem toàn bộ lịch sử event của 1 ví
+    /// Replay lại mọi thay đổi trạng thái: WalletCreated → Deposited → Withdrawn → SuspiciousDetected
+    /// </summary>
+    [HttpGet("events/{walletId}")]
+    public async Task<IActionResult> GetWalletEvents(Guid walletId)
+    {
+        var events = await _appService.GetEventsByWalletIdAsync(walletId);
+        return Ok(new
+        {
+            Message = "Event Sourcing — Lịch sử sự kiện của ví",
+            WalletId = walletId,
+            TotalEvents = events.Count(),
+            Events = events
+        });
+    }
 }

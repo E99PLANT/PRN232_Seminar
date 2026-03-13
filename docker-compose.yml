@@ -43,6 +43,9 @@ services:
       - "5209:8080"
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
+      - RabbitMQ__Host=rabbitmq
+    depends_on:
+      - rabbitmq
     networks:
       - prn232-network
     restart: unless-stopped
@@ -91,6 +94,9 @@ services:
       - "5253:8080"
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
+      - RabbitMQ__Host=rabbitmq
+    depends_on:
+      - rabbitmq
     networks:
       - prn232-network
     restart: unless-stopped

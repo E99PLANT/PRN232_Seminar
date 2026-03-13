@@ -1,3 +1,5 @@
+using MassTransit;
+using PRN232_Seminar.Shared.Events;
 using UserService.Application.DTOs;
 using UserService.Application.Interfaces;
 using UserService.Domain.Entities;
@@ -8,10 +10,12 @@ namespace UserService.Application.Services;
 public class UserAppService : IUserService
 {
     private readonly IUserRepository _userRepository;
+    private readonly IPublishEndpoint _publishEndpoint;
 
-    public UserAppService(IUserRepository userRepository)
+    public UserAppService(IUserRepository userRepository, IPublishEndpoint publishEndpoint)
     {
         _userRepository = userRepository;
+        _publishEndpoint = publishEndpoint;
     }
 
     public async Task<UserDto?> GetByIdAsync(int id)
@@ -49,6 +53,18 @@ public class UserAppService : IUserService
         };
 
         var createdUser = await _userRepository.CreateAsync(user);
+
+        // RabbitMQ — Publish UserCreatedEvent → PaymentService tự tạo Wallet
+        await _publishEndpoint.Publish(new UserCreatedEvent
+        {
+            UserId = createdUser.Id,
+            Username = createdUser.Username,
+            Email = createdUser.Email,
+            Timestamp = DateTime.UtcNow
+        });
+
+        Console.WriteLine($"[RabbitMQ] Đã publish UserCreatedEvent cho user: {createdUser.Username}");
+
         return MapToDto(createdUser);
     }
 

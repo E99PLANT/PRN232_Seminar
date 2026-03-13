@@ -107,15 +107,29 @@ public class WalletRepository : IWalletRepository
         var ticks = walletEvent.Timestamp.Ticks;
         walletEvent.Timestamp = new DateTime(ticks - (ticks % 10), walletEvent.Timestamp.Kind);
 
-        // Lấy hash của event cuối cùng (nếu có) để tạo chain
-        var lastEvent = await _context.WalletEvents
-            .Where(e => e.AggregateId == walletEvent.AggregateId)
-            .OrderByDescending(e => e.Timestamp)
-            .FirstOrDefaultAsync();
+        // Kiểm tra change tracker trước (cho trường hợp ghi nhiều events liên tiếp trước SaveChanges)
+        var localLast = _context.ChangeTracker.Entries<WalletEvent>()
+            .Where(e => e.Entity.AggregateId == walletEvent.AggregateId && e.State == EntityState.Added)
+            .OrderByDescending(e => e.Entity.Timestamp)
+            .Select(e => e.Entity)
+            .FirstOrDefault();
 
-        walletEvent.PreviousHash = lastEvent?.Hash ?? "GENESIS";
+        if (localLast != null)
+        {
+            // Có event chưa save → dùng hash của nó
+            walletEvent.PreviousHash = localLast.Hash;
+        }
+        else
+        {
+            // Query DB cho event cuối cùng đã save
+            var dbLast = await _context.WalletEvents
+                .Where(e => e.AggregateId == walletEvent.AggregateId)
+                .OrderByDescending(e => e.Timestamp)
+                .FirstOrDefaultAsync();
+            walletEvent.PreviousHash = dbLast?.Hash ?? "GENESIS";
+        }
+
         walletEvent.Hash = ComputeHash(walletEvent);
-
         await _context.WalletEvents.AddAsync(walletEvent);
     }
 

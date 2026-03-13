@@ -23,4 +23,7 @@ public interface IWalletAppService
 
     // Event Sourcing — Xem toàn bộ event history
     Task<IEnumerable<object>> GetEventsByWalletIdAsync(Guid walletId);
+
+    // Event Integrity — Kiểm tra hash chain có bị giả mạo không
+    Task<object> VerifyEventIntegrityAsync(Guid walletId);
 }

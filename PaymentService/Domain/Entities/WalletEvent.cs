@@ -26,4 +26,10 @@ public class WalletEvent
 
     /// <summary>Thời gian xảy ra sự kiện</summary>
     public DateTime Timestamp { get; set; } = DateTime.UtcNow;
+
+    /// <summary>SHA256 hash của event hiện tại (chống giả mạo)</summary>
+    public string Hash { get; set; } = string.Empty;
+
+    /// <summary>Hash của event trước đó (tạo chuỗi hash chain)</summary>
+    public string PreviousHash { get; set; } = string.Empty;
 }

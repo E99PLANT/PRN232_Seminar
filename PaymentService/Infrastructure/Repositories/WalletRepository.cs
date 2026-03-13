@@ -2,6 +2,8 @@ using Microsoft.EntityFrameworkCore;
 using PaymentService.Domain.Entities;
 using PaymentService.Domain.Interfaces;
 using PaymentService.Infrastructure.Data;
+using System.Security.Cryptography;
+using System.Text;
 
 namespace PaymentService.Infrastructure.Repositories;
 
@@ -100,7 +102,26 @@ public class WalletRepository : IWalletRepository
 
     public async Task AppendEventAsync(WalletEvent walletEvent)
     {
+        // Lấy hash của event cuối cùng (nếu có) để tạo chain
+        var lastEvent = await _context.WalletEvents
+            .Where(e => e.AggregateId == walletEvent.AggregateId)
+            .OrderByDescending(e => e.Timestamp)
+            .FirstOrDefaultAsync();
+
+        walletEvent.PreviousHash = lastEvent?.Hash ?? "GENESIS";
+        walletEvent.Hash = ComputeHash(walletEvent);
+
         await _context.WalletEvents.AddAsync(walletEvent);
+    }
+
+    /// <summary>
+    /// Tính SHA256 hash = SHA256(PreviousHash + EventType + EventData + Timestamp)
+    /// </summary>
+    private static string ComputeHash(WalletEvent e)
+    {
+        var raw = $"{e.PreviousHash}|{e.EventType}|{e.EventData}|{e.Timestamp:O}";
+        var bytes = SHA256.HashData(Encoding.UTF8.GetBytes(raw));
+        return Convert.ToHexString(bytes);
     }
 
     public async Task<IEnumerable<WalletEvent>> GetEventsByWalletIdAsync(Guid walletId)

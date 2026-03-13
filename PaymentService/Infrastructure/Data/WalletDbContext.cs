@@ -117,6 +117,14 @@ public class WalletDbContext : DbContext
             // Index cho Event Sourcing queries
             entity.HasIndex(e => e.AggregateId);
             entity.HasIndex(e => e.Timestamp);
+
+            // Hash chain cho integrity verification
+            entity.Property(e => e.Hash)
+                .IsRequired()
+                .HasMaxLength(64);
+
+            entity.Property(e => e.PreviousHash)
+                .HasMaxLength(64);
         });
     }
 }

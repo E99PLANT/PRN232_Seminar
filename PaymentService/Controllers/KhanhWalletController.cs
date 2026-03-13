@@ -165,4 +165,14 @@ public class KhanhWalletController : ControllerBase
             Events = events
         });
     }
+
+    /// <summary>
+    /// VERIFY INTEGRITY — Kiểm tra hash chain, phát hiện event bị giả mạo
+    /// </summary>
+    [HttpGet("events/{walletId}/verify")]
+    public async Task<IActionResult> VerifyEventIntegrity(Guid walletId)
+    {
+        var result = await _appService.VerifyEventIntegrityAsync(walletId);
+        return Ok(result);
+    }
 }

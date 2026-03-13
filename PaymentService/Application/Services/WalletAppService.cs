@@ -272,8 +272,61 @@ public class WalletAppService : IWalletAppService
             e.AggregateId,
             e.EventType,
             EventData = JsonSerializer.Deserialize<object>(e.EventData),
-            e.Timestamp
+            e.Timestamp,
+            e.Hash,
+            e.PreviousHash
         });
+    }
+
+    /// <summary>
+    /// Kiểm tra toàn vẹn hash chain — phát hiện event bị giả mạo
+    /// </summary>
+    public async Task<object> VerifyEventIntegrityAsync(Guid walletId)
+    {
+        var events = (await _repository.GetEventsByWalletIdAsync(walletId)).ToList();
+        if (!events.Any())
+            return new { IsValid = true, Message = "Không có event nào để kiểm tra.", TotalEvents = 0 };
+
+        var tamperedEvents = new List<object>();
+        string previousHash = "GENESIS";
+
+        foreach (var e in events)
+        {
+            // Tính lại hash từ dữ liệu hiện tại
+            var raw = $"{e.PreviousHash}|{e.EventType}|{e.EventData}|{e.Timestamp:O}";
+            var expectedHash = Convert.ToHexString(
+                System.Security.Cryptography.SHA256.HashData(
+                    System.Text.Encoding.UTF8.GetBytes(raw)));
+
+            bool hashValid = e.Hash == expectedHash;
+            bool chainValid = e.PreviousHash == previousHash;
+
+            if (!hashValid || !chainValid)
+            {
+                tamperedEvents.Add(new
+                {
+                    EventId = e.Id,
+                    e.EventType,
+                    e.Timestamp,
+                    Issue = !hashValid ? "Hash không khớp — nội dung đã bị sửa" : "Chain đứt gãy — PreviousHash không khớp",
+                    StoredHash = e.Hash,
+                    ExpectedHash = expectedHash
+                });
+            }
+
+            previousHash = e.Hash;
+        }
+
+        return new
+        {
+            IsValid = !tamperedEvents.Any(),
+            TotalEvents = events.Count,
+            TamperedCount = tamperedEvents.Count,
+            Message = tamperedEvents.Any()
+                ? $"🚨 PHÁT HIỆN {tamperedEvents.Count} event bị giả mạo!"
+                : "✅ Toàn bộ event hợp lệ — không phát hiện giả mạo.",
+            TamperedEvents = tamperedEvents
+        };
     }
 
     // =====================================================================

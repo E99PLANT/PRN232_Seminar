@@ -46,6 +46,19 @@ public class KhanhWalletController : ControllerBase
     }
 
     /// <summary>
+    /// Tìm Wallet theo Username (dùng sau khi tạo user qua RabbitMQ)
+    /// </summary>
+    [HttpGet("accounts/by-username/{username}")]
+    public async Task<IActionResult> GetWalletByUsername(string username)
+    {
+        var result = await _appService.GetWalletByUsernameAsync(username);
+        if (result == null)
+            return NotFound(new { Message = $"Không tìm thấy ví cho username: {username}. Có thể RabbitMQ chưa xử lý xong." });
+
+        return Ok(result);
+    }
+
+    /// <summary>
     /// Nạp tiền vào ví (Deposit)
     /// </summary>
     [HttpPost("deposit")]

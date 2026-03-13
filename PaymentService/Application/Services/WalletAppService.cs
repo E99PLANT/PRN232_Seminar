@@ -86,6 +86,26 @@ public class WalletAppService : IWalletAppService
     }
 
     /// <summary>
+    /// Tìm Wallet theo Username (dùng sau khi tạo user qua RabbitMQ)
+    /// </summary>
+    public async Task<WalletDto?> GetWalletByUsernameAsync(string username)
+    {
+        var account = await _repository.GetAccountByUsernameAsync(username);
+        if (account?.Wallet == null) return null;
+
+        return new WalletDto
+        {
+            WalletId = account.Wallet.Id,
+            AccountId = account.Id,
+            Username = account.Username,
+            Email = account.Email,
+            Balance = account.Wallet.Balance,
+            Currency = account.Wallet.Currency,
+            LastUpdated = account.Wallet.LastUpdated
+        };
+    }
+
+    /// <summary>
     /// Xử lý giao dịch: Nạp tiền (Deposit) hoặc Rút tiền (Withdraw)
     /// Tự động kiểm tra và đánh dấu hoạt động bất thường
     /// </summary>

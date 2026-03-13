@@ -23,6 +23,13 @@ public class WalletRepository : IWalletRepository
             .FirstOrDefaultAsync(a => a.Id == accountId);
     }
 
+    public async Task<Account?> GetAccountByUsernameAsync(string username)
+    {
+        return await _context.Accounts
+            .Include(a => a.Wallet)
+            .FirstOrDefaultAsync(a => a.Username == username);
+    }
+
     public async Task<Account> CreateAccountAsync(Account account)
     {
         await _context.Accounts.AddAsync(account);

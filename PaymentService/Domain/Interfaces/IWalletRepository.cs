@@ -6,6 +6,7 @@ public interface IWalletRepository
 {
     // === Account ===
     Task<Account?> GetAccountByIdAsync(Guid accountId);
+    Task<Account?> GetAccountByUsernameAsync(string username);
     Task<Account> CreateAccountAsync(Account account);
 
     // === Wallet ===

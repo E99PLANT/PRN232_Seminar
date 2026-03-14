@@ -1,100 +1,169 @@
 {
-  "Routes": [
-    {
-      "DownstreamPathTemplate": "/{everything}",
-      "DownstreamScheme": "http",
-      "DownstreamHostAndPorts": [
+    "Routes": [
         {
-          "Host": "localhost",
-          "Port": 5209
-        }
-      ],
-      "UpstreamPathTemplate": "/user-service/{everything}",
-      "UpstreamHttpMethod": [ "GET", "POST", "PUT", "DELETE" ],
-      "SwaggerKey": "user-service"
-    },
-    {
-      "DownstreamPathTemplate": "/{everything}",
-      "DownstreamScheme": "http",
-      "DownstreamHostAndPorts": [
+            "DownstreamPathTemplate": "/{everything}",
+            "DownstreamScheme": "http",
+            "DownstreamHostAndPorts": [
+                {
+                    "Host": "localhost",
+                    "Port": 5209
+                }
+            ],
+            "UpstreamPathTemplate": "/user-service/{everything}",
+            "UpstreamHttpMethod": [ "GET", "POST", "PUT", "DELETE" ],
+            "SwaggerKey": "user-service"
+        },
         {
-          "Host": "localhost",
-          "Port": 5267
-        }
-      ],
-      "UpstreamPathTemplate": "/order-service/{everything}",
-      "UpstreamHttpMethod": [ "GET", "POST", "PUT", "DELETE" ],
-      "SwaggerKey": "order-service"
-    },
-    {
-      "DownstreamPathTemplate": "/{everything}",
-      "DownstreamScheme": "http",
-      "DownstreamHostAndPorts": [
+            "DownstreamPathTemplate": "/{everything}",
+            "DownstreamScheme": "http",
+            "DownstreamHostAndPorts": [
+                {
+                    "Host": "localhost",
+                    "Port": 5267
+                }
+            ],
+            "UpstreamPathTemplate": "/order-service/{everything}",
+            "UpstreamHttpMethod": [ "GET", "POST", "PUT", "DELETE" ],
+            "SwaggerKey": "order-service"
+        },
         {
-          "Host": "localhost",
-          "Port": 5254
-        }
-      ],
-      "UpstreamPathTemplate": "/inventory-service/{everything}",
-      "UpstreamHttpMethod": [ "GET", "POST", "PUT", "DELETE" ],
-      "SwaggerKey": "inventory-service"
-    },
-    {
-      "DownstreamPathTemplate": "/{everything}",
-      "DownstreamScheme": "http",
-      "DownstreamHostAndPorts": [
+            "DownstreamPathTemplate": "/{everything}",
+            "DownstreamScheme": "http",
+            "DownstreamHostAndPorts": [
+                {
+                    "Host": "localhost",
+                    "Port": 5254
+                }
+            ],
+            "UpstreamPathTemplate": "/inventory-service/{everything}",
+            "UpstreamHttpMethod": [ "GET", "POST", "PUT", "DELETE" ],
+            "SwaggerKey": "inventory-service"
+        },
         {
-          "Host": "localhost",
-          "Port": 5253
-        }
-      ],
-      "UpstreamPathTemplate": "/payment-service/{everything}",
-      "UpstreamHttpMethod": [ "GET", "POST", "PUT", "DELETE" ],
-      "SwaggerKey": "payment-service"
-    }
-  ],
-  "SwaggerEndPoints": [
-    {
-      "Key": "user-service",
-      "Config": [
+            "DownstreamPathTemplate": "/{everything}",
+            "DownstreamScheme": "http",
+            "DownstreamHostAndPorts": [
+                {
+                    "Host": "localhost",
+                    "Port": 5253
+                }
+            ],
+            "UpstreamPathTemplate": "/payment-service/{everything}",
+            "UpstreamHttpMethod": [ "GET", "POST", "PUT", "DELETE" ],
+            "SwaggerKey": "payment-service"
+        },
         {
-          "Name": "User Service",
-          "Version": "v1",
-          "Url": "http://localhost:5209/swagger/v1/swagger.json"
-        }
-      ]
-    },
-    {
-      "Key": "order-service",
-      "Config": [
+            "DownstreamPathTemplate": "/api/Notifications/{everything}",
+            "DownstreamScheme": "http",
+            "DownstreamHostAndPorts": [
+                {
+                    "Host": "localhost",
+                    "Port": 5100
+                }
+            ],
+            "UpstreamPathTemplate": "/notification-service/{everything}",
+            "UpstreamHttpMethod": [ "GET", "POST", "PUT", "DELETE" ],
+            "SwaggerKey": "notification-service"
+        },
         {
-          "Name": "Order Service",
-          "Version": "v1",
-          "Url": "http://localhost:5267/swagger/v1/swagger.json"
-        }
-      ]
-    },
-    {
-      "Key": "inventory-service",
-      "Config": [
+            "DownstreamPathTemplate": "/api/Balance/{everything}",
+            "DownstreamScheme": "http",
+            "DownstreamHostAndPorts": [
+                {
+                    "Host": "localhost",
+                    "Port": 5200
+                }
+            ],
+            "UpstreamPathTemplate": "/balance-service/{everything}",
+            "UpstreamHttpMethod": [ "GET", "POST", "PUT", "DELETE" ],
+            "SwaggerKey": "balance-service"
+        },
         {
-          "Name": "Inventory Service",
-          "Version": "v1",
-          "Url": "http://localhost:5254/swagger/v1/swagger.json"
+            "DownstreamPathTemplate": "/api/Transaction/{everything}",
+            "DownstreamScheme": "http",
+            "DownstreamHostAndPorts": [
+                {
+                    "Host": "localhost",
+                    "Port": 5300
+                }
+            ],
+            "UpstreamPathTemplate": "/transaction-service/{everything}",
+            "UpstreamHttpMethod": [ "GET", "POST", "PUT", "DELETE" ],
+            "SwaggerKey": "transaction-service"
         }
-      ]
-    },
-    {
-      "Key": "payment-service",
-      "Config": [
+    ],
+    "SwaggerEndPoints": [
         {
-          "Name": "Payment Service",
-          "Version": "v1",
-          "Url": "http://localhost:5253/swagger/v1/swagger.json"
+            "Key": "user-service",
+            "Config": [
+                {
+                    "Name": "User Service",
+                    "Version": "v1",
+                    "Url": "http://localhost:5209/swagger/v1/swagger.json"
+                }
+            ]
+        },
+        {
+            "Key": "order-service",
+            "Config": [
+                {
+                    "Name": "Order Service",
+                    "Version": "v1",
+                    "Url": "http://localhost:5267/swagger/v1/swagger.json"
+                }
+            ]
+        },
+        {
+            "Key": "inventory-service",
+            "Config": [
+                {
+                    "Name": "Inventory Service",
+                    "Version": "v1",
+                    "Url": "http://localhost:5254/swagger/v1/swagger.json"
+                }
+            ]
+        },
+        {
+            "Key": "payment-service",
+            "Config": [
+                {
+                    "Name": "Payment Service",
+                    "Version": "v1",
+                    "Url": "http://localhost:5253/swagger/v1/swagger.json"
+                }
+            ]
+        },
+        {
+            "Key": "notification-service",
+            "Config": [
+                {
+                    "Name": "Notification API",
+                    "Version": "v1",
+                    "Url": "http://localhost:5100/swagger/v1/swagger.json"
+                }
+            ]
+        },
+        {
+            "Key": "balance-service",
+            "Config": [
+                {
+                    "Name": "Balance API",
+                    "Version": "v1",
+                    "Url": "http://localhost:5200/swagger/v1/swagger.json"
+                }
+            ]
+        },
+        {
+            "Key": "transaction-service",
+            "Config": [
+                {
+                    "Name": "Transaction API",
+                    "Version": "v1",
+                    "Url": "http://localhost:5300/swagger/v1/swagger.json"
+                }
+            ]
         }
-      ]
-    }
-  ],
+    ],
   "GlobalConfiguration": {
     "BaseUrl": "http://localhost:5092"
   }

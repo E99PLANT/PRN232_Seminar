@@ -83,3 +83,39 @@ GET {{ApiGateway_HostAddress}}/payment-service/api/payments
 Accept: application/json
 
 ###
+
+### 
+# ============================================
+# NOTIFICATION SERVICE
+# ============================================
+GET {{ApiGateway_HostAddress}}/notification-service/
+
+###
+# ============================================
+# BALANCE SERVICE
+# ============================================
+GET {{ApiGateway_HostAddress}}/balance-service/
+
+POST {{ApiGateway_HostAddress}}/balance-service/
+Content-Type: application/json
+
+{
+  "userId": "user-guid-here",
+  "amount": 1000
+}
+
+###
+# ============================================
+# TRANSACTION SERVICE
+# ============================================
+POST {{ApiGateway_HostAddress}}/transaction-service/
+Content-Type: application/json
+
+{
+  "senderId": "guid-1",
+  "receiverId": "guid-2",
+  "amount": 500
+}
+
+### Approve Transaction
+POST {{ApiGateway_HostAddress}}/transaction-service/{id}/approve

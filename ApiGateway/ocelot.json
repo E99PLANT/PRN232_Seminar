@@ -58,7 +58,7 @@
             "DownstreamHostAndPorts": [
                 {
                     "Host": "localhost",
-                    "Port": 5100
+                    "Port": 5039
                 }
             ],
             "UpstreamPathTemplate": "/notification-service/{everything}",
@@ -71,7 +71,7 @@
             "DownstreamHostAndPorts": [
                 {
                     "Host": "localhost",
-                    "Port": 5200
+                    "Port": 5117
                 }
             ],
             "UpstreamPathTemplate": "/balance-service/{everything}",
@@ -84,7 +84,7 @@
             "DownstreamHostAndPorts": [
                 {
                     "Host": "localhost",
-                    "Port": 5300
+                    "Port": 5105
                 }
             ],
             "UpstreamPathTemplate": "/transaction-service/{everything}",
@@ -139,7 +139,7 @@
                 {
                     "Name": "Notification API",
                     "Version": "v1",
-                    "Url": "http://localhost:5100/swagger/v1/swagger.json"
+                    "Url": "http://localhost:5039/swagger/v1/swagger.json"
                 }
             ]
         },
@@ -149,7 +149,7 @@
                 {
                     "Name": "Balance API",
                     "Version": "v1",
-                    "Url": "http://localhost:5200/swagger/v1/swagger.json"
+                    "Url": "http://localhost:5117/swagger/v1/swagger.json"
                 }
             ]
         },
@@ -159,7 +159,7 @@
                 {
                     "Name": "Transaction API",
                     "Version": "v1",
-                    "Url": "http://localhost:5300/swagger/v1/swagger.json"
+                    "Url": "http://localhost:5105/swagger/v1/swagger.json"
                 }
             ]
         }

@@ -29,6 +29,9 @@ services:
       - order-service
       - inventory-service
       - payment-service
+      - notification-service
+      - balance-service
+      - transaction-service
     networks:
       - prn232-network
     restart: unless-stopped

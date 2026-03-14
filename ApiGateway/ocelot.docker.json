@@ -51,6 +51,45 @@
       "UpstreamPathTemplate": "/payment-service/{everything}",
       "UpstreamHttpMethod": [ "GET", "POST", "PUT", "DELETE" ],
       "SwaggerKey": "payment-service"
+    },
+    {
+      "DownstreamPathTemplate": "/api/Notifications/{everything}",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "notification-service",
+          "Port": 8080
+        }
+      ],
+      "UpstreamPathTemplate": "/notification-service/{everything}",
+      "UpstreamHttpMethod": [ "GET", "POST", "PUT", "DELETE" ],
+      "SwaggerKey": "notification-service"
+    },
+    {
+      "DownstreamPathTemplate": "/api/Balance/{everything}",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "balance-service",
+          "Port": 8080
+        }
+      ],
+      "UpstreamPathTemplate": "/balance-service/{everything}",
+      "UpstreamHttpMethod": [ "GET", "POST", "PUT", "DELETE" ],
+      "SwaggerKey": "balance-service"
+    },
+    {
+      "DownstreamPathTemplate": "/api/Transaction/{everything}",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "transaction-service",
+          "Port": 8080
+        }
+      ],
+      "UpstreamPathTemplate": "/transaction-service/{everything}",
+      "UpstreamHttpMethod": [ "GET", "POST", "PUT", "DELETE" ],
+      "SwaggerKey": "transaction-service"
     }
   ],
   "SwaggerEndPoints": [
@@ -91,6 +130,36 @@
           "Name": "Payment Service",
           "Version": "v1",
           "Url": "http://payment-service:8080/swagger/v1/swagger.json"
+        }
+      ]
+    },
+    {
+      "Key": "notification-service",
+      "Config": [
+        {
+          "Name": "Notification API",
+          "Version": "v1",
+          "Url": "http://notification-service:8080/swagger/v1/swagger.json"
+        }
+      ]
+    },
+    {
+      "Key": "balance-service",
+      "Config": [
+        {
+          "Name": "Balance API",
+          "Version": "v1",
+          "Url": "http://balance-service:8080/swagger/v1/swagger.json"
+        }
+      ]
+    },
+    {
+      "Key": "transaction-service",
+      "Config": [
+        {
+          "Name": "Transaction API",
+          "Version": "v1",
+          "Url": "http://transaction-service:8080/swagger/v1/swagger.json"
         }
       ]
     }

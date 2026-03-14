@@ -1,6 +1,29 @@
-@Inventory_HostAddress = http://localhost:5254
+﻿@Inventory_HostAddress = http://localhost:5254
+### 1. Test gọi API giả lập Saga Pattern (Tồn kho)
+# Gửi một sự kiện tạo đơn hàng giả vào hệ thống
+POST {{Inventory_HostAddress}}/api/danh-inventory/test-order-created
+Content-Type: application/json
 
-GET {{Inventory_HostAddress}}/weatherforecast/
+{
+  "orderId": "11111111-1111-1111-1111-111111111111",
+  "productId": "22222222-2222-2222-2222-222222222222",
+  "quantity": 2
+}
+
+### 2. Nhập kho một sản phẩm (Dùng ProductId giống hệt cái ở trên)
+POST {{Inventory_HostAddress}}/api/danh-inventory/import-stock
+Content-Type: application/json
+
+{
+  "productId": "22222222-2222-2222-2222-222222222222",
+  "productName": "Laptop Gaming",
+  "stockQuantity": 50
+}
+
+### 3. Xem số lượng tồn kho hiện tại (Phục vụ UI InventoryCard)
+GET {{Inventory_HostAddress}}/api/danh-inventory/stock/22222222-2222-2222-2222-222222222222
 Accept: application/json
 
-###
+### 4. Xem lịch sử Event Sourcing (Phục vụ UI Event Monitor)
+GET {{Inventory_HostAddress}}/api/danh-inventory/events?count=10
+Accept: application/jsony

@@ -16,5 +16,19 @@ namespace TransactionService.Controllers
             var transactionId = await _transactionService.CreateTransaction(request);
             return Ok(new { Id = transactionId });
         }
+
+        [HttpPost("{id}/approve")]
+        public async Task<IActionResult> ApproveTransaction(Guid id)
+        {
+            await _transactionService.ApproveTransaction(id);
+            return Ok(new { Message = "Transaction Approved. Events broadcasted!" });
+        }
+
+        [HttpGet]
+        public IActionResult GetAll()
+        {
+            var list = _transactionService.GetAllTransactions();
+            return Ok(list);
+        }
     }
 }

@@ -1,22 +1,29 @@
 ﻿using Marten;
+using Marten.Events.Daemon.Resiliency;
+using Marten.Events.Projections;
 using Microsoft.EntityFrameworkCore;
+using TransactionService.Application.Handlers;
 using TransactionService.Application.Interfaces;
 using TransactionService.Application.Projectors;
 using TransactionService.Application.Services;
 using TransactionService.Domain.Interfaces;
 using TransactionService.Infrastructure.Data;
+using TransactionService.Infrastructure.Messaging;
 using TransactionService.Infrastructure.Repos;
 using Wolverine;
-using Wolverine.EntityFrameworkCore;
-using Wolverine.Marten;
-//using Wolverine;
-//using Wolverine.EntityFrameworkCore;
-//using Wolverine.Marten;
-//using Wolverine.Postgresql;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+
+#region Register Services/Repos
+
+builder.Services.AddScoped<ITransactionRepository, TransactionRepository>();
+builder.Services.AddScoped<ITransactionService, TransactionsService>();
+builder.Services.AddScoped<IEventBus, RabbitMqEventBus>();
+builder.Services.AddSingleton<TransactionToRabbitMqProjection>();
+
+#endregion
 
 #region Db Context
 
@@ -29,48 +36,44 @@ builder.Services.AddDbContext<TransactionDbContext>(options =>
 
 builder.Host.UseWolverine(opts =>
 {
-    // Tự động tích hợp Transactional Outbox với Marten
-    opts.Policies.AutoApplyTransactions();
-
-    // Tích hợp với EF Core để cùng quản lý Transaction
-    opts.UseEntityFrameworkCoreTransactions();
-
-    opts.Discovery.IncludeAssembly(typeof(TransactionProjector).Assembly);
+    // Quét Handler
+    opts.Discovery.IncludeAssembly(typeof(TransactionHandler).Assembly);
 });
 
 #endregion
 
+#region RabbitMQ
+
+var factory = new RabbitMQ.Client.ConnectionFactory { HostName = "localhost" };
+var connection = await factory.CreateConnectionAsync();
+builder.Services.AddSingleton(connection);
+
+#endregion
 
 #region Marten (Event Store)
 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? "";
-
 builder.Services.AddMarten(options =>
 {
     options.Connection(connectionString);
     options.DatabaseSchemaName = "transaction_service";
     options.Events.DatabaseSchemaName = "transaction_service";
-    // Cấu hình lưu trữ Event
-    options.Events.MetadataConfig.HeadersEnabled = true;
+
+    // Đăng ký Projection nhưng cấu hình chạy ASYNC
+    options.Projections.Add(
+            builder.Services.BuildServiceProvider().GetRequiredService<TransactionToRabbitMqProjection>(),
+            ProjectionLifecycle.Async
+        );
 })
-.IntegrateWithWolverine()
-.UseLightweightSessions();
+.UseLightweightSessions()
+.AddAsyncDaemon(DaemonMode.HotCold); // Kích hoạt trình chạy ngầm
 
 #endregion
-
-
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-
-#region Register Services/Repos
-
-builder.Services.AddScoped<ITransactionRepository, TransactionRepository>();
-builder.Services.AddScoped<ITransactionService, TransactionsService>();
-
-#endregion
 
 var app = builder.Build();
 

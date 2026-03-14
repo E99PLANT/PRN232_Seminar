@@ -2,11 +2,10 @@
 using TransactionService.Domain.Events;
 using TransactionService.Infrastructure.Data;
 
-namespace TransactionService.Application.Projectors
+namespace TransactionService.Application.Handlers
 {
-    public class TransactionProjector
+    public class TransactionHandler
     {
-        // Wolverine sẽ tự động kích hoạt hàm này khi Marten lưu Event thành công
         public async Task Handle(TransactionCreated @event, TransactionDbContext dbContext)
         {
             var entity = new TransactionDetails

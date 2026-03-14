@@ -1,24 +1,20 @@
 using ApiGateway.Middlewares;
 using Ocelot.DependencyInjection;
 using Ocelot.Middleware;
+using MMLib.SwaggerForOcelot.DependencyInjection;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add Ocelot configuration
-builder.Configuration.AddJsonFile("ocelot.json", optional: false, reloadOnChange: true);
+// Docker dùng ocelot.docker.json (routing qua container name)
+// Local dùng ocelot.json (routing qua localhost)
+var isDocker = Environment.GetEnvironmentVariable("DOCKER_ENV") == "true";
+var ocelotFile = isDocker ? "ocelot.docker.json" : "ocelot.json";
+builder.Configuration.AddJsonFile(ocelotFile, optional: false, reloadOnChange: true);
 
 // Add services to the container.
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen(c =>
-{
-    c.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo
-    {
-        Title = "API Gateway",
-        Version = "v1",
-        Description = "API Gateway for Microservices E-Commerce System"
-    });
-});
 
 // Add CORS
 builder.Services.AddCors(options =>
@@ -34,8 +30,9 @@ builder.Services.AddCors(options =>
 // Add Health Checks
 builder.Services.AddHealthChecks();
 
-// Add Ocelot
+// Add Ocelot + Swagger for Ocelot
 builder.Services.AddOcelot();
+builder.Services.AddSwaggerForOcelot(builder.Configuration);
 
 var app = builder.Build();
 
@@ -50,14 +47,11 @@ app.UseMiddleware<RequestLoggingMiddleware>();
 // CORS
 app.UseCors("AllowAll");
 
-if (app.Environment.IsDevelopment())
+// Swagger aggregation — gom tất cả service Swagger vào 1 trang
+app.UseSwaggerForOcelotUI(options =>
 {
-    app.UseSwagger();
-    app.UseSwaggerUI(c =>
-    {
-        c.SwaggerEndpoint("/swagger/v1/swagger.json", "API Gateway v1");
-    });
-}
+    options.PathToSwaggerGenerator = "/swagger/docs";
+});
 
 // Health Check endpoints
 app.MapHealthChecks("/health");

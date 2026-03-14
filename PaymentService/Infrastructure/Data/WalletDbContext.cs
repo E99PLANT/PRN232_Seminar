@@ -12,6 +12,7 @@ public class WalletDbContext : DbContext
     public DbSet<Account> Accounts { get; set; }
     public DbSet<Wallet> Wallets { get; set; }
     public DbSet<WalletTransaction> WalletTransactions { get; set; }
+    public DbSet<WalletEvent> WalletEvents { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -95,6 +96,35 @@ public class WalletDbContext : DbContext
             // Index cho tra cứu bất thường nhanh
             entity.HasIndex(e => e.IsSuspicious);
             entity.HasIndex(e => e.Timestamp);
+        });
+
+        // === Cấu hình bảng WalletEvent (Event Sourcing) ===
+        modelBuilder.Entity<WalletEvent>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+
+            entity.Property(e => e.AggregateType)
+                .IsRequired()
+                .HasMaxLength(50);
+
+            entity.Property(e => e.EventType)
+                .IsRequired()
+                .HasMaxLength(50);
+
+            entity.Property(e => e.EventData)
+                .IsRequired();
+
+            // Index cho Event Sourcing queries
+            entity.HasIndex(e => e.AggregateId);
+            entity.HasIndex(e => e.Timestamp);
+
+            // Hash chain cho integrity verification
+            entity.Property(e => e.Hash)
+                .IsRequired()
+                .HasMaxLength(64);
+
+            entity.Property(e => e.PreviousHash)
+                .HasMaxLength(64);
         });
     }
 }

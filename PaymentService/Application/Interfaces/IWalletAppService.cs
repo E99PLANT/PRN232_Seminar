@@ -9,6 +9,8 @@ public interface IWalletAppService
 
     // Xem thông tin Wallet
     Task<WalletDto?> GetWalletByAccountIdAsync(Guid accountId);
+    Task<WalletDto?> GetWalletByUsernameAsync(string username);
+    Task<WalletDto?> GetWalletByEmailAsync(string email);
 
     // Thực hiện giao dịch (Nạp/Rút tiền) + tự động kiểm tra bất thường
     Task<TransactionDto> ProcessTransactionAsync(CreateTransactionDto dto);
@@ -18,4 +20,10 @@ public interface IWalletAppService
 
     // Tra cứu hoạt động bất thường
     Task<IEnumerable<TransactionDto>> GetSuspiciousTransactionsAsync(int count = 20);
+
+    // Event Sourcing — Xem toàn bộ event history
+    Task<IEnumerable<object>> GetEventsByWalletIdAsync(Guid walletId);
+
+    // Event Integrity — Kiểm tra hash chain có bị giả mạo không
+    Task<object> VerifyEventIntegrityAsync(Guid walletId);
 }

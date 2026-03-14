@@ -6,6 +6,8 @@ public interface IWalletRepository
 {
     // === Account ===
     Task<Account?> GetAccountByIdAsync(Guid accountId);
+    Task<Account?> GetAccountByUsernameAsync(string username);
+    Task<Account?> GetAccountByEmailAsync(string email);
     Task<Account> CreateAccountAsync(Account account);
 
     // === Wallet ===
@@ -22,6 +24,10 @@ public interface IWalletRepository
 
     // Lấy tất cả giao dịch bị đánh dấu bất thường
     Task<IEnumerable<WalletTransaction>> GetSuspiciousTransactionsAsync(int count = 20);
+
+    // === Event Sourcing ===
+    Task AppendEventAsync(WalletEvent walletEvent);
+    Task<IEnumerable<WalletEvent>> GetEventsByWalletIdAsync(Guid walletId);
 
     // Lưu thay đổi
     Task SaveChangesAsync();

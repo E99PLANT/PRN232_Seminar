@@ -1,4 +1,6 @@
+using MassTransit;
 using Microsoft.EntityFrameworkCore;
+using UserService.Application.Consumers;
 using UserService.Application.Interfaces;
 using UserService.Application.Services;
 using UserService.Domain.Interfaces;
@@ -16,6 +18,25 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddDbContext<UserDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
+// MassTransit + RabbitMQ
+builder.Services.AddMassTransit(x =>
+{
+    // Đăng ký Consumer lắng nghe SuspiciousActivityDetectedEvent từ PaymentService
+    x.AddConsumer<SuspiciousActivityConsumer>();
+
+    x.UsingRabbitMq((context, cfg) =>
+    {
+        var rabbitConfig = builder.Configuration.GetSection("RabbitMQ");
+        cfg.Host(rabbitConfig["Host"], "/", h =>
+        {
+            h.Username(rabbitConfig["Username"]);
+            h.Password(rabbitConfig["Password"]);
+        });
+
+        cfg.ConfigureEndpoints(context);
+    });
+});
+
 // Dependency Injection
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IUserService, UserAppService>();
@@ -30,9 +51,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
 app.UseAuthorization();
-
 app.MapControllers();
 
 app.Run();

@@ -46,6 +46,32 @@ public class KhanhWalletController : ControllerBase
     }
 
     /// <summary>
+    /// Tìm Wallet theo Username (dùng sau khi tạo user qua RabbitMQ)
+    /// </summary>
+    [HttpGet("accounts/by-username/{username}")]
+    public async Task<IActionResult> GetWalletByUsername(string username)
+    {
+        var result = await _appService.GetWalletByUsernameAsync(username);
+        if (result == null)
+            return NotFound(new { Message = $"Không tìm thấy ví cho username: {username}. Có thể RabbitMQ chưa xử lý xong." });
+
+        return Ok(result);
+    }
+
+    /// <summary>
+    /// Tìm Wallet theo Email
+    /// </summary>
+    [HttpGet("accounts/by-email/{email}")]
+    public async Task<IActionResult> GetWalletByEmail(string email)
+    {
+        var result = await _appService.GetWalletByEmailAsync(email);
+        if (result == null)
+            return NotFound(new { Message = $"Không tìm thấy ví cho email: {email}. Có thể user chưa tồn tại hoặc ví chưa được tạo." });
+
+        return Ok(result);
+    }
+
+    /// <summary>
     /// Nạp tiền vào ví (Deposit)
     /// </summary>
     [HttpPost("deposit")]
@@ -121,5 +147,32 @@ public class KhanhWalletController : ControllerBase
             },
             Transactions = result
         });
+    }
+
+    /// <summary>
+    /// EVENT SOURCING — Xem toàn bộ lịch sử event của 1 ví
+    /// Replay lại mọi thay đổi trạng thái: WalletCreated → Deposited → Withdrawn → SuspiciousDetected
+    /// </summary>
+    [HttpGet("events/{walletId}")]
+    public async Task<IActionResult> GetWalletEvents(Guid walletId)
+    {
+        var events = await _appService.GetEventsByWalletIdAsync(walletId);
+        return Ok(new
+        {
+            Message = "Event Sourcing — Lịch sử sự kiện của ví",
+            WalletId = walletId,
+            TotalEvents = events.Count(),
+            Events = events
+        });
+    }
+
+    /// <summary>
+    /// VERIFY INTEGRITY — Kiểm tra hash chain, phát hiện event bị giả mạo
+    /// </summary>
+    [HttpGet("events/{walletId}/verify")]
+    public async Task<IActionResult> VerifyEventIntegrity(Guid walletId)
+    {
+        var result = await _appService.VerifyEventIntegrityAsync(walletId);
+        return Ok(result);
     }
 }

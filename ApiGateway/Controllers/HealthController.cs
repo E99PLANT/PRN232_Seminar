@@ -20,7 +20,7 @@ public class HealthController : ControllerBase
     public IActionResult Get()
     {
         _logger.LogInformation("Health check requested");
-        
+
         return Ok(new
         {
             Status = "Healthy",
@@ -47,7 +47,10 @@ public class HealthController : ControllerBase
                 new { Name = "UserService", Url = "http://localhost:5209", Status = "Unknown" },
                 new { Name = "OrderService", Url = "http://localhost:5267", Status = "Unknown" },
                 new { Name = "InventoryService", Url = "http://localhost:5254", Status = "Unknown" },
-                new { Name = "PaymentService", Url = "http://localhost:5253", Status = "Unknown" }
+                new { Name = "PaymentService", Url = "http://localhost:5253", Status = "Unknown" },
+                new { Name = "NotificationService", Url = "http://localhost:5100", Status = "Unknown" },
+            new { Name = "BalanceService", Url = "http://localhost:5200", Status = "Unknown" },
+            new { Name = "TransactionService", Url = "http://localhost:5300", Status = "Unknown" }
             }
         });
     }

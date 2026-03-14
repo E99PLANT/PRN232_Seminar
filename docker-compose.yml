@@ -114,8 +114,12 @@ services:
       - "5100:8080"
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
+      - RabbitMQ__Host=rabbitmq
+    depends_on:
+      - rabbitmq
     networks:
       - prn232-network
+    restart: unless-stopped
 
   # === Balance Service (Mới) ===
   balance-service:
@@ -127,8 +131,12 @@ services:
       - "5200:8080"
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
+      - RabbitMQ__Host=rabbitmq
+    depends_on:
+      - rabbitmq
     networks:
       - prn232-network
+    restart: unless-stopped
 
   # === Transaction Service (Mới - Event Sourcing) ===
   transaction-service:
@@ -140,9 +148,12 @@ services:
       - "5300:8080"
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
-      # Lưu ý: Vì bạn dùng Marten & Postgres (Supabase), hãy thêm ConnectionString nếu cần thiết tại đây
+      - RabbitMQ__Host=rabbitmq
+    depends_on:
+      - rabbitmq
     networks:
       - prn232-network
+    restart: unless-stopped
 
 networks:
   prn232-network:

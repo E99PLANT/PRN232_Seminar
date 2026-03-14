@@ -101,6 +101,46 @@ services:
       - prn232-network
     restart: unless-stopped
 
+  # === Notification Service (Mới) ===
+  notification-service:
+    build:
+      context: .
+      dockerfile: NotificationService/Dockerfile
+    container_name: prn232-notification-service
+    ports:
+      - "5100:8080"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+    networks:
+      - prn232-network
+
+  # === Balance Service (Mới) ===
+  balance-service:
+    build:
+      context: .
+      dockerfile: BalanceService/Dockerfile
+    container_name: prn232-balance-service
+    ports:
+      - "5200:8080"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+    networks:
+      - prn232-network
+
+  # === Transaction Service (Mới - Event Sourcing) ===
+  transaction-service:
+    build:
+      context: .
+      dockerfile: TransactionService/Dockerfile
+    container_name: prn232-transaction-service
+    ports:
+      - "5300:8080"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      # Lưu ý: Vì bạn dùng Marten & Postgres (Supabase), hãy thêm ConnectionString nếu cần thiết tại đây
+    networks:
+      - prn232-network
+
 networks:
   prn232-network:
     driver: bridge

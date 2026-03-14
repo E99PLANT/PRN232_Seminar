@@ -1,4 +1,4 @@
-using Marten;
+﻿using Marten;
 using Microsoft.EntityFrameworkCore;
 using NotificationService.Application.Handlers;
 using NotificationService.Application.Handlers.Impls;
@@ -22,7 +22,20 @@ builder.Services.AddDbContext<NotificationDbContext>(options =>
 
 #region RabbitMQ
 
-var factory = new RabbitMQ.Client.ConnectionFactory { HostName = "localhost" };
+// 1. Lấy thông tin từ file cấu hình (appsettings.json)
+var rabbitConfig = builder.Configuration.GetSection("RabbitMQ");
+var rabbitHost = rabbitConfig["Host"] ?? "localhost";
+var rabbitUser = rabbitConfig["Username"] ?? "guest";
+var rabbitPass = rabbitConfig["Password"] ?? "guest";
+
+// 2. Thiết lập Factory với đầy đủ thông tin xác thực
+var factory = new RabbitMQ.Client.ConnectionFactory
+{
+    HostName = rabbitHost,
+    UserName = rabbitUser,
+    Password = rabbitPass
+};
+
 var connection = await factory.CreateConnectionAsync();
 builder.Services.AddSingleton(connection);
 

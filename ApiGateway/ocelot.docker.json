@@ -90,6 +90,45 @@
       "UpstreamPathTemplate": "/transaction-service/{everything}",
       "UpstreamHttpMethod": [ "GET", "POST", "PUT", "DELETE" ],
       "SwaggerKey": "transaction-service"
+    },
+    {
+      "DownstreamPathTemplate": "/{everything}",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "auth-service",
+          "Port": 8080
+        }
+      ],
+      "UpstreamPathTemplate": "/auth-service/{everything}",
+      "UpstreamHttpMethod": [ "GET", "POST", "PUT", "DELETE" ],
+      "SwaggerKey": "auth-service"
+    },
+    {
+      "DownstreamPathTemplate": "/{everything}",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "userprofile-service",
+          "Port": 8080
+        }
+      ],
+      "UpstreamPathTemplate": "/userprofile-service/{everything}",
+      "UpstreamHttpMethod": [ "GET", "POST", "PUT", "DELETE" ],
+      "SwaggerKey": "userprofile-service"
+    },
+    {
+      "DownstreamPathTemplate": "/{everything}",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "userbehavior-service",
+          "Port": 8080
+        }
+      ],
+      "UpstreamPathTemplate": "/userbehavior-service/{everything}",
+      "UpstreamHttpMethod": [ "GET", "POST", "PUT", "DELETE" ],
+      "SwaggerKey": "userbehavior-service"
     }
   ],
   "SwaggerEndPoints": [
@@ -160,6 +199,36 @@
           "Name": "Transaction API",
           "Version": "v1",
           "Url": "http://transaction-service:8080/swagger/v1/swagger.json"
+        }
+      ]
+    },
+    {
+      "Key": "auth-service",
+      "Config": [
+        {
+          "Name": "Auth API",
+          "Version": "v1",
+          "Url": "http://auth-service:8080/swagger/v1/swagger.json"
+        }
+      ]
+    },
+    {
+      "Key": "userprofile-service",
+      "Config": [
+        {
+          "Name": "UserProfile API",
+          "Version": "v1",
+          "Url": "http://userprofile-service:8080/swagger/v1/swagger.json"
+        }
+      ]
+    },
+    {
+      "Key": "userbehavior-service",
+      "Config": [
+        {
+          "Name": "UserBehavior API",
+          "Version": "v1",
+          "Url": "http://userbehavior-service:8080/swagger/v1/swagger.json"
         }
       ]
     }

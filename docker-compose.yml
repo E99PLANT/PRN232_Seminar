@@ -32,6 +32,9 @@ services:
       - notification-service
       - balance-service
       - transaction-service
+      - auth-service
+      - userprofile-service
+      - userbehavior-service
     networks:
       - prn232-network
     restart: unless-stopped

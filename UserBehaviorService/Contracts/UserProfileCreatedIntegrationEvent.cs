@@ -1,6 +1,6 @@
-﻿namespace AuthService.Contracts
+﻿namespace UserBehaviorService.Contracts
 {
-    public class UserVerifiedIntegrationEvent
+    public class UserProfileCreatedIntegrationEvent
     {
         public string UserId { get; set; } = default!;
         public string Email { get; set; } = default!;

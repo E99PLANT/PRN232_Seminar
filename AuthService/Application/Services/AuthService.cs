@@ -3,6 +3,7 @@ using AuthService.Application.Interfaces;
 using AuthService.Domain.Enums;
 using AuthService.Domain.Events;
 using AuthService.Domain.Entities;
+using AuthService.Contracts;
 
 namespace AuthService.Application.Services
 {
@@ -58,6 +59,13 @@ namespace AuthService.Application.Services
                     UserId = account.Id,
                     Email = account.Email
                 });
+
+                await _messagePublisher.PublishAsync("user.registered", new UserRegisteredIntegrationEvent
+                {
+                    UserId = account.Id,
+                    Email = account.Email,
+                    OccurredOn = DateTimeOffset.UtcNow
+                });
             }
             else
             {
@@ -110,8 +118,12 @@ namespace AuthService.Application.Services
                 Email = account.Email
             });
 
-            //await _profileProvisionClient.CreateProfileAsync(account.Id, account.Email);
-            await _messagePublisher.PublishUserVerifiedAsync(account.Id, account.Email);
+            await _messagePublisher.PublishAsync("user.verified", new UserVerifiedIntegrationEvent
+            {
+                UserId = account.Id,
+                Email = account.Email,
+                OccurredOn = DateTimeOffset.UtcNow
+            });
 
             return new
             {
@@ -144,6 +156,13 @@ namespace AuthService.Application.Services
                 Email = account.Email
             });
 
+            await _messagePublisher.PublishAsync("user.logged_in", new UserLoggedInIntegrationEvent
+            {
+                UserId = account.Id,
+                Email = account.Email,
+                OccurredOn = DateTimeOffset.UtcNow
+            });
+
             return new
             {
                 accountId = account.Id,
@@ -171,6 +190,13 @@ namespace AuthService.Application.Services
                 UserId = account.Id,
                 Reason = reason
             });
+
+            await _messagePublisher.PublishAsync("user.locked", new UserLockedIntegrationEvent
+            {
+                UserId = account.Id,
+                Reason = reason,
+                OccurredOn = DateTimeOffset.UtcNow
+            });
         }
 
         public async Task UnlockAsync(string userId)
@@ -189,6 +215,12 @@ namespace AuthService.Application.Services
             await _eventStoreService.AppendAsync(account.Id, "Account", new UserUnlockedEvent
             {
                 UserId = account.Id
+            });
+
+            await _messagePublisher.PublishAsync("user.unlocked", new UserUnlockedIntegrationEvent
+            {
+                UserId = account.Id,
+                OccurredOn = DateTimeOffset.UtcNow
             });
         }
     }

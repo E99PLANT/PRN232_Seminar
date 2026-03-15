@@ -1,12 +1,11 @@
 using Microsoft.EntityFrameworkCore;
-using UserProfileService.Application.Interfaces;
-using UserProfileService.Application.Services;
-using UserProfileService.Infrastructure;
-using UserProfileService.Infrastructure.Consumers;
-using UserProfileService.Infrastructure.Repositories;
-using UserProfileService.Infrastructure.Services;
+using UserBehaviorService.Application.Consumers;
+using UserBehaviorService.Application.Interfaces;
+using UserBehaviorService.Application.Services;
+using UserBehaviorService.Infrastructure.Repositories;
+using UserBehaviorService.Infrastructure;
 
-namespace UserProfileService
+namespace UserBehaviorService
 {
     public class Program
     {
@@ -24,14 +23,13 @@ namespace UserProfileService
             builder.Services.AddDbContext<AppDbContext>(options =>
                 options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-            builder.Services.AddScoped<IUserProfileRepository, UserProfileRepository>();
-            builder.Services.AddScoped<IEventStoreRepository, EventStoreRepository>();
+            builder.Services.AddScoped<IUserBehaviorRepository, UserBehaviorRepository>();
+            builder.Services.AddScoped<IUserLoginHistoryRepository, UserLoginHistoryRepository>();
+            builder.Services.AddScoped<IConsumedMessageRepository, ConsumedMessageRepository>();
 
-            builder.Services.AddScoped<IEventStoreService, EventStoreService>();
-            builder.Services.AddScoped<IUserProfileService, UserProfileService.Application.Services.UserProfileService>();
+            builder.Services.AddScoped<IUserBehaviorAnalyticsService, UserBehaviorAnalyticsService>();
 
-            builder.Services.AddHostedService<UserVerifiedConsumer>();
-            builder.Services.AddScoped<IMessagePublisher, RabbitMqPublisher>();
+            builder.Services.AddHostedService<UserBehaviorConsumer>();
 
             var app = builder.Build();
 

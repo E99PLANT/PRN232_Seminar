@@ -4,6 +4,7 @@ using UserProfileService.Application.Projectors;
 using UserProfileService.Application.ReadModels;
 using UserProfileService.Domain.Entities;
 using UserProfileService.Domain.Events;
+using UserProfileService.Contracts;
 
 namespace UserProfileService.Application.Services
 {
@@ -11,14 +12,17 @@ namespace UserProfileService.Application.Services
     {
         private readonly IUserProfileRepository _userProfileRepository;
         private readonly IEventStoreService _eventStoreService;
+        private readonly IMessagePublisher _messagePublisher;
         private readonly UserProfileBehaviorProjector _projector = new();
 
         public UserProfileService(
             IUserProfileRepository userProfileRepository,
-            IEventStoreService eventStoreService)
+            IEventStoreService eventStoreService,
+            IMessagePublisher messagePublisher)
         {
             _userProfileRepository = userProfileRepository;
             _eventStoreService = eventStoreService;
+            _messagePublisher = messagePublisher;
         }
 
         public async Task<UserProfile> CreateFromAuthAsync(CreateProfileFromAuthRequest request)
@@ -38,6 +42,13 @@ namespace UserProfileService.Application.Services
             {
                 UserId = profile.AccountId,
                 Email = profile.Email
+            });
+
+            await _messagePublisher.PublishAsync("userprofile.created", new UserProfileCreatedIntegrationEvent
+            {
+                UserId = profile.AccountId,
+                Email = profile.Email,
+                OccurredOn = DateTimeOffset.UtcNow
             });
 
             return profile;
@@ -68,6 +79,16 @@ namespace UserProfileService.Application.Services
                 Address = profile.Address,
                 Gender = profile.Gender,
                 Dob = profile.Dob
+            });
+
+            await _messagePublisher.PublishAsync("userprofile.updated", new UserProfileUpdatedIntegrationEvent
+            {
+                UserId = profile.AccountId,
+                FullName = profile.FullName,
+                Address = profile.Address,
+                Gender = profile.Gender,
+                Dob = profile.Dob,
+                OccurredOn = DateTimeOffset.UtcNow
             });
 
             return profile;

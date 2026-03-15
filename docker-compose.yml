@@ -198,6 +198,30 @@ services:
       - prn232-network
     restart: unless-stopped
 
+# === UserBehavior Service ===
+  userbehavior-service:
+    build:
+      context: .
+      dockerfile: UserBehaviorService/Dockerfile
+    container_name: prn232-userbehavior-service
+    ports:
+      - "7003:8080"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - RabbitMq__Host=rabbitmq
+      - RabbitMq__Port=5672
+      - RabbitMq__Username=guest
+      - RabbitMq__Password=guest
+      - RabbitMq__AuthExchange=customer.auth
+      - RabbitMq__ProfileExchange=customer.profile
+      - RabbitMq__Queue=userbehavior.analytics
+      - ConnectionStrings__DefaultConnection=Host=host.docker.internal;Port=5432;Database=UserBehaviorServiceDb;Username=postgres;Password=123456
+    depends_on:
+      - rabbitmq
+    networks:
+      - prn232-network
+    restart: unless-stopped
+
 networks:
   prn232-network:
     driver: bridge

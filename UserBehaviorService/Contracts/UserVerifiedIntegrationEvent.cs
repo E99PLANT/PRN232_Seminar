@@ -1,4 +1,4 @@
-﻿namespace AuthService.Contracts
+﻿namespace UserBehaviorService.Contracts
 {
     public class UserVerifiedIntegrationEvent
     {

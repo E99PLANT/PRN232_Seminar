@@ -1,6 +1,6 @@
 ﻿namespace AuthService.Contracts
 {
-    public class UserVerifiedIntegrationEvent
+    public class UserRegisteredIntegrationEvent
     {
         public string UserId { get; set; } = default!;
         public string Email { get; set; } = default!;

@@ -218,7 +218,6 @@ services:
       - RabbitMq__AuthExchange=customer.auth
       - RabbitMq__ProfileExchange=customer.profile
       - RabbitMq__Queue=userbehavior.analytics
-      - ConnectionStrings__DefaultConnection=Host=host.docker.internal;Port=5432;Database=UserBehaviorServiceDb;Username=postgres;Password=123456
     depends_on:
       - rabbitmq
     networks:

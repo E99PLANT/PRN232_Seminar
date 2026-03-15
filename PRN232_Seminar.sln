@@ -21,6 +21,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BalanceService", "BalanceSe
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NotificationService", "NotificationService\NotificationService.csproj", "{CCC6E20E-BF28-423E-B2A2-99367C8A39C2}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuthService", "AuthService\AuthService.csproj", "{6AF68ECC-4FEF-41EF-8198-8CDDE39674EC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UserProfileService", "UserProfileService\UserProfileService.csproj", "{E387A047-CD00-4BA5-8500-F040DDF74BDB}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -63,6 +67,14 @@ Global
 		{CCC6E20E-BF28-423E-B2A2-99367C8A39C2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CCC6E20E-BF28-423E-B2A2-99367C8A39C2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CCC6E20E-BF28-423E-B2A2-99367C8A39C2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6AF68ECC-4FEF-41EF-8198-8CDDE39674EC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6AF68ECC-4FEF-41EF-8198-8CDDE39674EC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6AF68ECC-4FEF-41EF-8198-8CDDE39674EC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6AF68ECC-4FEF-41EF-8198-8CDDE39674EC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E387A047-CD00-4BA5-8500-F040DDF74BDB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E387A047-CD00-4BA5-8500-F040DDF74BDB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E387A047-CD00-4BA5-8500-F040DDF74BDB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E387A047-CD00-4BA5-8500-F040DDF74BDB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

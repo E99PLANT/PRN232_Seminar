@@ -154,6 +154,49 @@ services:
     networks:
       - prn232-network
     restart: unless-stopped
+  # === Auth Service ===
+  auth-service:
+    build:
+      context: .
+      dockerfile: AuthService/Dockerfile
+    container_name: prn232-auth-service
+    ports:
+      - "7001:8080"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - RabbitMq__Host=rabbitmq
+      - RabbitMq__Port=5672
+      - RabbitMq__Username=guest
+      - RabbitMq__Password=guest
+      - RabbitMq__Exchange=customer.auth
+    depends_on:
+      - rabbitmq
+    networks:
+      - prn232-network
+    restart: unless-stopped
+
+  # === UserProfile Service ===
+  userprofile-service:
+    build:
+      context: .
+      dockerfile: UserProfileService/Dockerfile
+    container_name: prn232-userprofile-service
+    ports:
+      - "7002:8080"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - RabbitMq__Host=rabbitmq
+      - RabbitMq__Port=5672
+      - RabbitMq__Username=guest
+      - RabbitMq__Password=guest
+      - RabbitMq__Exchange=customer.auth
+      - RabbitMq__Queue=userprofile.create
+      - RabbitMq__RoutingKey=user.verified
+    depends_on:
+      - rabbitmq
+    networks:
+      - prn232-network
+    restart: unless-stopped
 
 networks:
   prn232-network:

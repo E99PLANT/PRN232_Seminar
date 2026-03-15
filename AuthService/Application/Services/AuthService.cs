@@ -150,17 +150,34 @@ namespace AuthService.Application.Services
             if (!BCrypt.Net.BCrypt.Verify(request.Password, account.PasswordHash))
                 throw new Exception("Invalid password.");
 
+            // Seminar/demo mode:
+            // nếu có nhập thời gian thì dùng thời gian nhập vào
+            // nếu không thì dùng thời gian hiện tại
+            var loggedInAt = request.LoggedInAt ?? DateTimeOffset.UtcNow;
+
+            // nếu không nhập session duration thì mặc định 15 phút
+            var sessionDurationMinutes = request.SessionDurationMinutes ?? 15;
+
+            if (sessionDurationMinutes < 1)
+                sessionDurationMinutes = 1;
+
             await _eventStoreService.AppendAsync(account.Id, "Account", new UserLoggedInEvent
             {
                 UserId = account.Id,
-                Email = account.Email
+                Email = account.Email,
+                LoggedInAt = loggedInAt,
+                SessionDurationMinutes = sessionDurationMinutes,
+
+                // DomainEvent base có OccurredOn, để đồng bộ luôn với thời gian demo
+                OccurredOn = loggedInAt
             });
 
             await _messagePublisher.PublishAsync("user.logged_in", new UserLoggedInIntegrationEvent
             {
                 UserId = account.Id,
                 Email = account.Email,
-                OccurredOn = DateTimeOffset.UtcNow
+                OccurredOn = loggedInAt,
+                SessionDurationMinutes = sessionDurationMinutes
             });
 
             return new
@@ -168,6 +185,8 @@ namespace AuthService.Application.Services
                 accountId = account.Id,
                 email = account.Email,
                 status = account.Status.ToString(),
+                loggedInAt,
+                sessionDurationMinutes,
                 message = "Login successfully"
             };
         }

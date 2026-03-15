@@ -95,7 +95,12 @@ namespace UserBehaviorService.Application.Consumers
                         case "user.logged_in":
                             {
                                 var msg = JsonSerializer.Deserialize<UserLoggedInIntegrationEvent>(json)!;
-                                await analyticsService.HandleUserLoggedInAsync(messageId, msg.UserId, msg.Email, msg.OccurredOn);
+                                await analyticsService.HandleUserLoggedInAsync(
+                                    messageId,
+                                    msg.UserId,
+                                    msg.Email,
+                                    msg.OccurredOn,
+                                    msg.SessionDurationMinutes);
                                 break;
                             }
                         case "user.locked":

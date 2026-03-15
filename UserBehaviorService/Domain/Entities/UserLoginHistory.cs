@@ -12,5 +12,7 @@
         public int LoginHour { get; set; }
         public string Weekday { get; set; } = default!;
         public DateTime DateOnlyUtc { get; set; }
+
+        public int SessionDurationMinutes { get; set; }
     }
 }

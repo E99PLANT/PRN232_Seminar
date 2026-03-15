@@ -10,5 +10,11 @@ namespace AuthService.Application.DTOs.Auth
 
         [Required]
         public string Password { get; set; } = default!;
+
+        //test seminar
+        public DateTimeOffset? LoggedInAt { get; set; }
+
+        //test seminar
+        public int? SessionDurationMinutes { get; set; }
     }
 }

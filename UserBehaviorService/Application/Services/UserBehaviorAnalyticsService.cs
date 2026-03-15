@@ -46,7 +46,7 @@ namespace UserBehaviorService.Application.Services
             await _consumedMessageRepository.AddAsync(messageId, "user.verified");
         }
 
-        public async Task HandleUserLoggedInAsync(string messageId, string userId, string email, DateTimeOffset occurredOn)
+        public async Task HandleUserLoggedInAsync(string messageId, string userId, string email, DateTimeOffset occurredOn, int sessionDurationMinutes)
         {
             if (await _consumedMessageRepository.ExistsAsync(messageId)) return;
 
@@ -65,7 +65,8 @@ namespace UserBehaviorService.Application.Services
                 LoggedInAt = occurredOn,
                 LoginHour = occurredOn.Hour,
                 Weekday = occurredOn.DayOfWeek.ToString(),
-                DateOnlyUtc = occurredOn.UtcDateTime.Date
+                DateOnlyUtc = occurredOn.UtcDateTime.Date,
+                SessionDurationMinutes = sessionDurationMinutes
             });
 
             await RecalculateLoginAnalyticsAsync(projection, userId);
@@ -240,7 +241,6 @@ namespace UserBehaviorService.Application.Services
                 projection.EstimatedActiveDaysSpan = 0;
             }
 
-            // AverageDaysBetweenLogins
             if (logins.Count >= 2)
             {
                 var dayDiffs = new List<double>();
@@ -257,44 +257,8 @@ namespace UserBehaviorService.Application.Services
                 projection.AverageDaysBetweenLogins = 0;
             }
 
-            // AverageSessionDurationMinutes (ước lượng đơn giản)
-            // Logic:
-            // - lấy khoảng cách từ login hiện tại đến login kế tiếp
-            // - cap tối đa 30 phút để tránh phiên bị kéo quá dài không thực tế
-            // - login cuối cùng: tạm tính mặc định 15 phút
-            var estimatedSessionMinutes = new List<double>();
-
-            if (logins.Count == 1)
-            {
-                estimatedSessionMinutes.Add(15);
-            }
-            else
-            {
-                for (int i = 0; i < logins.Count; i++)
-                {
-                    if (i < logins.Count - 1)
-                    {
-                        var diffMinutes = (logins[i + 1].LoggedInAt - logins[i].LoggedInAt).TotalMinutes;
-
-                        // nếu 2 lần login quá gần nhau thì lấy đúng diff
-                        // nếu quá xa thì cap 30 phút
-                        var estimated = Math.Min(diffMinutes, 30);
-
-                        // tránh số âm hoặc 0 bất thường
-                        if (estimated <= 0)
-                            estimated = 15;
-
-                        estimatedSessionMinutes.Add(estimated);
-                    }
-                    else
-                    {
-                        // login cuối cùng không có login kế tiếp để suy ra
-                        estimatedSessionMinutes.Add(15);
-                    }
-                }
-            }
-
-            projection.AverageSessionDurationMinutes = Math.Round(estimatedSessionMinutes.Average(), 2);
+            projection.AverageSessionDurationMinutes =
+                Math.Round(logins.Average(x => x.SessionDurationMinutes), 2);
         }
     }
 }

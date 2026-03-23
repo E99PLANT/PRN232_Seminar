@@ -388,6 +388,125 @@ public class WalletAppService : IWalletAppService
     }
 
     // =====================================================================
+    // REPLAY & SELF-HEALING — Tái dựng balance từ events
+    // =====================================================================
+
+    /// <summary>
+    /// Đọc tất cả events từ đầu → cộng trừ → ra balance đúng.
+    /// So sánh với balance hiện tại trong bảng Wallet.
+    /// Nếu khác nhau → tự ghi đè balance đúng (Self-Healing).
+    /// </summary>
+    public async Task<object> ReplayAndHealAsync(Guid walletId)
+    {
+        var wallet = await _dbContext.Wallets.FindAsync(walletId);
+        if (wallet == null)
+            throw new Exception("Không tìm thấy ví.");
+
+        // 1. Đọc tất cả events của ví này
+        var events = await _repository.GetEventsByWalletIdAsync(walletId);
+        var eventList = events.ToList();
+
+        if (!eventList.Any())
+            throw new Exception("Không có events nào cho ví này.");
+
+        // 2. Replay: cộng trừ từ đầu
+        decimal replayedBalance = 0;
+        var replaySteps = new List<object>();
+
+        foreach (var evt in eventList)
+        {
+            try
+            {
+                var data = JsonSerializer.Deserialize<JsonElement>(evt.EventData);
+
+                if (evt.EventType == "Deposited")
+                {
+                    var amount = data.GetProperty("Amount").GetDecimal();
+                    replayedBalance += amount;
+                    replaySteps.Add(new
+                    {
+                        evt.EventType,
+                        Amount = amount,
+                        RunningBalance = replayedBalance,
+                        evt.Timestamp
+                    });
+                }
+                else if (evt.EventType == "Withdrawn")
+                {
+                    var amount = data.GetProperty("Amount").GetDecimal();
+                    replayedBalance -= amount;
+                    replaySteps.Add(new
+                    {
+                        evt.EventType,
+                        Amount = amount,
+                        RunningBalance = replayedBalance,
+                        evt.Timestamp
+                    });
+                }
+                else
+                {
+                    // WalletCreated, SuspiciousDetected → không ảnh hưởng balance
+                    replaySteps.Add(new
+                    {
+                        evt.EventType,
+                        Amount = (decimal?)null,
+                        RunningBalance = replayedBalance,
+                        evt.Timestamp
+                    });
+                }
+            }
+            catch
+            {
+                replaySteps.Add(new
+                {
+                    evt.EventType,
+                    Amount = (decimal?)null,
+                    RunningBalance = replayedBalance,
+                    evt.Timestamp,
+                    Error = "Không thể parse EventData"
+                });
+            }
+        }
+
+        // 3. So sánh
+        var currentBalance = wallet.Balance;
+        var isMatch = currentBalance == replayedBalance;
+
+        string message;
+        bool wasHealed = false;
+
+        if (isMatch)
+        {
+            message = $"✅ Dữ liệu toàn vẹn! Balance hiện tại ({currentBalance:N0} VND) khớp với Event Store.";
+        }
+        else
+        {
+            // 4. Self-Healing — ghi đè balance đúng
+            wallet.Balance = replayedBalance;
+            wallet.LastUpdated = DateTime.UtcNow;
+            await _repository.UpdateWalletAsync(wallet);
+            await _repository.SaveChangesAsync();
+            wasHealed = true;
+
+            message = $"⚠️ PHÁT HIỆN SAI LỆCH! Balance trong DB: {currentBalance:N0} VND → Event Store tính ra: {replayedBalance:N0} VND. Đã tự động sửa lại!";
+
+            Console.WriteLine($"[SELF-HEALING] WalletId={walletId} | DB={currentBalance} | Replay={replayedBalance} | Đã ghi đè!");
+        }
+
+        return new
+        {
+            WalletId = walletId,
+            BalanceFromWallet = currentBalance,
+            BalanceFromEvents = replayedBalance,
+            IsMatch = isMatch,
+            WasHealed = wasHealed,
+            Message = message,
+            TotalEvents = eventList.Count,
+            ReplaySteps = replaySteps
+        };
+    }
+
+    // =====================================================================
     // MAPPING HELPERS
     // =====================================================================
 

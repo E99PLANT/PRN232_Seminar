@@ -3,6 +3,7 @@ using PaymentService.Application.DTOs;
 using PaymentService.Application.Interfaces;
 using PaymentService.Domain.Entities;
 using PaymentService.Domain.Interfaces;
+using PaymentService.Infrastructure.Data;
 using PRN232_Seminar.Shared.Events;
 using System.Text.Json;
 
@@ -12,11 +13,13 @@ public class WalletAppService : IWalletAppService
 {
     private readonly IWalletRepository _repository;
     private readonly IPublishEndpoint _publishEndpoint;
+    private readonly WalletDbContext _dbContext;
 
-    public WalletAppService(IWalletRepository repository, IPublishEndpoint publishEndpoint)
+    public WalletAppService(IWalletRepository repository, IPublishEndpoint publishEndpoint, WalletDbContext dbContext)
     {
         _repository = repository;
         _publishEndpoint = publishEndpoint;
+        _dbContext = dbContext;
     }
 
     /// <summary>
@@ -222,19 +225,26 @@ public class WalletAppService : IWalletAppService
                 Timestamp = DateTime.UtcNow
             });
 
-            // RabbitMQ — Publish SuspiciousActivityDetectedEvent → UserService
-            await _publishEndpoint.Publish(new SuspiciousActivityDetectedEvent
+            // OUTBOX PATTERN — Lưu event vào DB thay vì gửi RabbitMQ trực tiếp
+            var outboxMessage = new OutboxMessage
             {
-                WalletId = wallet.Id,
-                TransactionId = transaction.Id,
-                Username = wallet.Account.Username,
-                Amount = dto.Amount,
-                Reason = reason!,
-                Timestamp = DateTime.UtcNow
-            });
+                EventType = nameof(SuspiciousActivityDetectedEvent),
+                EventData = JsonSerializer.Serialize(new SuspiciousActivityDetectedEvent
+                {
+                    WalletId = wallet.Id,
+                    TransactionId = transaction.Id,
+                    Username = wallet.Account.Username,
+                    Amount = dto.Amount,
+                    Reason = reason!,
+                    Timestamp = DateTime.UtcNow
+                }),
+                CreatedAt = DateTime.UtcNow,
+                IsSent = false
+            };
+            _dbContext.OutboxMessages.Add(outboxMessage);
 
             Console.WriteLine($"[CẢNH BÁO] Giao dịch bất thường: {reason} | WalletId: {wallet.Id} | Amount: {dto.Amount}");
-            Console.WriteLine($"[RabbitMQ] Đã gửi SuspiciousActivityDetectedEvent → UserService");
+            Console.WriteLine($"[Outbox] Đã lưu SuspiciousActivityDetectedEvent vào OutboxMessages");
         }
 
         await _repository.SaveChangesAsync();

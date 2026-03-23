@@ -52,6 +52,9 @@ builder.Services.AddMassTransit(x =>
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+// Outbox Pattern — Background job gửi message từ DB lên RabbitMQ
+builder.Services.AddHostedService<OutboxProcessor>();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

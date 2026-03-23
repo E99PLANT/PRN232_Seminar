@@ -1,9 +1,11 @@
+using System.Text.Json;
 using MassTransit;
 using PRN232_Seminar.Shared.Events;
 using UserService.Application.DTOs;
 using UserService.Application.Interfaces;
 using UserService.Domain.Entities;
 using UserService.Domain.Interfaces;
+using UserService.Infrastructure.Data;
 
 namespace UserService.Application.Services;
 
@@ -11,11 +13,13 @@ public class UserAppService : IUserService
 {
     private readonly IUserRepository _userRepository;
     private readonly IPublishEndpoint _publishEndpoint;
+    private readonly UserDbContext _dbContext;
 
-    public UserAppService(IUserRepository userRepository, IPublishEndpoint publishEndpoint)
+    public UserAppService(IUserRepository userRepository, IPublishEndpoint publishEndpoint, UserDbContext dbContext)
     {
         _userRepository = userRepository;
         _publishEndpoint = publishEndpoint;
+        _dbContext = dbContext;
     }
 
     public async Task<UserDto?> GetByIdAsync(int id)
@@ -38,7 +42,6 @@ public class UserAppService : IUserService
 
     public async Task<UserDto> CreateAsync(CreateUserDto createUserDto)
     {
-        // Simple password hashing (use BCrypt in production!)
         var passwordHash = BCrypt.Net.BCrypt.HashPassword(createUserDto.Password);
 
         var user = new User
@@ -52,20 +55,48 @@ public class UserAppService : IUserService
             IsActive = true
         };
 
-        var createdUser = await _userRepository.CreateAsync(user);
+        // ============================================================
+        // OUTBOX PATTERN: Lưu user + event trong CÙNG 1 transaction
+        // → RabbitMQ sập cũng không mất event
+        // ============================================================
+        await using var transaction = await _dbContext.Database.BeginTransactionAsync();
 
-        // RabbitMQ — Publish UserCreatedEvent → PaymentService tự tạo Wallet
-        await _publishEndpoint.Publish(new UserCreatedEvent
+        try
         {
-            UserId = createdUser.Id,
-            Username = createdUser.Username,
-            Email = createdUser.Email,
-            Timestamp = DateTime.UtcNow
-        });
+            // 1. Lưu user vào DB
+            _dbContext.Users.Add(user);
+            await _dbContext.SaveChangesAsync();
 
-        Console.WriteLine($"[RabbitMQ] Đã publish UserCreatedEvent cho user: {createdUser.Username}");
+            // 2. Lưu event vào bảng OutboxMessages (thay vì gửi RabbitMQ trực tiếp)
+            var outboxMessage = new OutboxMessage
+            {
+                EventType = nameof(UserCreatedEvent),
+                EventData = JsonSerializer.Serialize(new UserCreatedEvent
+                {
+                    UserId = user.Id,
+                    Username = user.Username,
+                    Email = user.Email,
+                    Timestamp = DateTime.UtcNow
+                }),
+                CreatedAt = DateTime.UtcNow,
+                IsSent = false
+            };
 
-        return MapToDto(createdUser);
+            _dbContext.OutboxMessages.Add(outboxMessage);
+            await _dbContext.SaveChangesAsync();
+
+            // 3. Commit cả 2 cùng lúc — đảm bảo user + event luôn đồng bộ
+            await transaction.CommitAsync();
+
+            Console.WriteLine($"[Outbox] Đã lưu UserCreatedEvent vào OutboxMessages cho user: {user.Username}");
+        }
+        catch
+        {
+            await transaction.RollbackAsync();
+            throw;
+        }
+
+        return MapToDto(user);
     }
 
     public async Task<UserDto?> UpdateAsync(int id, UpdateUserDto updateUserDto)
@@ -114,3 +145,4 @@ public class UserAppService : IUserService
         };
     }
 }
+

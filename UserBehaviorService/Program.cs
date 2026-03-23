@@ -2,8 +2,9 @@ using Microsoft.EntityFrameworkCore;
 using UserBehaviorService.Application.Consumers;
 using UserBehaviorService.Application.Interfaces;
 using UserBehaviorService.Application.Services;
-using UserBehaviorService.Infrastructure.Repositories;
 using UserBehaviorService.Infrastructure;
+using UserBehaviorService.Infrastructure.Messaging;
+using UserBehaviorService.Infrastructure.Repositories;
 
 namespace UserBehaviorService
 {
@@ -30,6 +31,9 @@ namespace UserBehaviorService
             builder.Services.AddScoped<IUserBehaviorAnalyticsService, UserBehaviorAnalyticsService>();
 
             builder.Services.AddHostedService<UserBehaviorConsumer>();
+
+            builder.Services.AddScoped<IUserBehaviorEventReplayService, UserBehaviorEventReplayService>();
+            builder.Services.AddSingleton<IRabbitMqRpcClient, RabbitMqRpcClient>();
 
             var app = builder.Build();
 

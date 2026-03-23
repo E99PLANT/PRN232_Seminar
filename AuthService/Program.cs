@@ -1,6 +1,7 @@
 using AuthService.Application.Interfaces;
 using AuthService.Application.Services;
 using AuthService.Infrastructure;
+using AuthService.Infrastructure.Messaging;
 using AuthService.Infrastructure.Repositories;
 using AuthService.Infrastructure.Services;
 using Microsoft.EntityFrameworkCore;
@@ -29,6 +30,9 @@ namespace AuthService
             builder.Services.AddHttpClient<IEmailSender, ResendEmailSender>();
            // builder.Services.AddHttpClient<IProfileProvisionClient, ProfileProvisionClient>();
             builder.Services.AddScoped<IMessagePublisher, RabbitMqPublisher>();
+            builder.Services.AddScoped<IAuthReplayService, AuthReplayService>();
+            builder.Services.AddHostedService<AuthReplayRpcConsumer>();
+            builder.Services.AddHostedService<AuthRawEventsRpcConsumer>();
 
             var app = builder.Build();
 

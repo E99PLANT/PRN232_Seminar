@@ -3,6 +3,7 @@ using UserProfileService.Application.Interfaces;
 using UserProfileService.Application.Services;
 using UserProfileService.Infrastructure;
 using UserProfileService.Infrastructure.Consumers;
+using UserProfileService.Infrastructure.Messaging;
 using UserProfileService.Infrastructure.Repositories;
 using UserProfileService.Infrastructure.Services;
 
@@ -31,6 +32,8 @@ namespace UserProfileService
             builder.Services.AddScoped<IUserProfileService, UserProfileService.Application.Services.UserProfileService>();
 
             builder.Services.AddHostedService<UserVerifiedConsumer>();
+            builder.Services.AddHostedService<UserProfileReplayRpcConsumer>();
+            builder.Services.AddHostedService<UserProfileRawEventsRpcConsumer>();
             builder.Services.AddScoped<IMessagePublisher, RabbitMqPublisher>();
 
             var app = builder.Build();

@@ -13,13 +13,13 @@ namespace TransactionService.Application.Projectors
         private readonly IServiceProvider _serviceProvider = serviceProvider;
 
         // Đổi tên từ Handle thành Project để Marten 7.x tự nhận diện
-        public async Task Project(TransactionApproved @event, IDocumentOperations operations)
+        public async void Project(TransactionApproved @event, IDocumentOperations operations)
         {
             // 1. Cấu hình Fallback: Chạy khi tất cả các lần Retry đều thất bại
             var fallbackOptions = new FallbackStrategyOptions<bool>
             {
                 ShouldHandle = new PredicateBuilder<bool>().Handle<Exception>(),
-                OnFallback = args =>
+                FallbackAction = args =>
                 {
                     // ĐÂY LÀ NƠI LOG KHI THẤT BẠI HOÀN TOÀN
                     Console.WriteLine($"[FALLBACK] Đã thử 10 lần nhưng không gửi được Event {@event.Id}.");

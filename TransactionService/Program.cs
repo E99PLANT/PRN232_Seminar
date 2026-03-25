@@ -65,6 +65,7 @@ builder.Services.AddSingleton(connection);
 
 #region Marten (Event Store)
 
+builder.Logging.SetMinimumLevel(LogLevel.Debug);
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? "";
 builder.Services.AddMarten(options =>
 {
@@ -77,6 +78,8 @@ builder.Services.AddMarten(options =>
                builder.Services.BuildServiceProvider().GetRequiredService<TransactionToRabbitMqProjection>(),
                ProjectionLifecycle.Async
            );
+
+
 })
 .UseLightweightSessions()
 .AddAsyncDaemon(DaemonMode.HotCold); // Kích hoạt trình chạy ngầm

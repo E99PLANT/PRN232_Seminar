@@ -10,6 +10,7 @@ public class UserDbContext : DbContext
     }
 
     public DbSet<User> Users { get; set; }
+    public DbSet<OutboxMessage> OutboxMessages { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -50,5 +51,23 @@ public class UserDbContext : DbContext
                 .IsRequired()
                 .HasDefaultValue(true);
         });
+
+        modelBuilder.Entity<OutboxMessage>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+
+            entity.Property(e => e.EventType)
+                .IsRequired()
+                .HasMaxLength(200);
+
+            entity.Property(e => e.EventData)
+                .IsRequired();
+
+            entity.Property(e => e.CreatedAt)
+                .IsRequired();
+
+            entity.HasIndex(e => e.IsSent);
+        });
     }
 }
+

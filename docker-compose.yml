@@ -29,6 +29,12 @@ services:
       - order-service
       - inventory-service
       - payment-service
+      - notification-service
+      - balance-service
+      - transaction-service
+      - auth-service
+      - userprofile-service
+      - userbehavior-service
     networks:
       - prn232-network
     restart: unless-stopped
@@ -111,8 +117,12 @@ services:
       - "5100:8080"
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
+      - RabbitMQ__Host=rabbitmq
+    depends_on:
+      - rabbitmq
     networks:
       - prn232-network
+    restart: unless-stopped
 
   # === Balance Service (Mới) ===
   balance-service:
@@ -124,8 +134,12 @@ services:
       - "5200:8080"
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
+      - RabbitMQ__Host=rabbitmq
+    depends_on:
+      - rabbitmq
     networks:
       - prn232-network
+    restart: unless-stopped
 
   # === Transaction Service (Mới - Event Sourcing) ===
   transaction-service:
@@ -137,9 +151,78 @@ services:
       - "5300:8080"
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
-      # Lưu ý: Vì bạn dùng Marten & Postgres (Supabase), hãy thêm ConnectionString nếu cần thiết tại đây
+      - RabbitMQ__Host=rabbitmq
+    depends_on:
+      - rabbitmq
     networks:
       - prn232-network
+    restart: unless-stopped
+  # === Auth Service ===
+  auth-service:
+    build:
+      context: .
+      dockerfile: AuthService/Dockerfile
+    container_name: prn232-auth-service
+    ports:
+      - "7001:8080"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - RabbitMq__Host=rabbitmq
+      - RabbitMq__Port=5672
+      - RabbitMq__Username=guest
+      - RabbitMq__Password=guest
+      - RabbitMq__Exchange=customer.auth
+    depends_on:
+      - rabbitmq
+    networks:
+      - prn232-network
+    restart: unless-stopped
+
+  # === UserProfile Service ===
+  userprofile-service:
+    build:
+      context: .
+      dockerfile: UserProfileService/Dockerfile
+    container_name: prn232-userprofile-service
+    ports:
+      - "7002:8080"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - RabbitMq__Host=rabbitmq
+      - RabbitMq__Port=5672
+      - RabbitMq__Username=guest
+      - RabbitMq__Password=guest
+      - RabbitMq__Exchange=customer.auth
+      - RabbitMq__Queue=userprofile.create
+      - RabbitMq__RoutingKey=user.verified
+    depends_on:
+      - rabbitmq
+    networks:
+      - prn232-network
+    restart: unless-stopped
+
+# === UserBehavior Service ===
+  userbehavior-service:
+    build:
+      context: .
+      dockerfile: UserBehaviorService/Dockerfile
+    container_name: prn232-userbehavior-service
+    ports:
+      - "7003:8080"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - RabbitMq__Host=rabbitmq
+      - RabbitMq__Port=5672
+      - RabbitMq__Username=guest
+      - RabbitMq__Password=guest
+      - RabbitMq__AuthExchange=customer.auth
+      - RabbitMq__ProfileExchange=customer.profile
+      - RabbitMq__Queue=userbehavior.analytics
+    depends_on:
+      - rabbitmq
+    networks:
+      - prn232-network
+    restart: unless-stopped
 
 networks:
   prn232-network:

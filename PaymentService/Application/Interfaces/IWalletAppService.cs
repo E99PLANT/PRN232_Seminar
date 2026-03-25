@@ -26,4 +26,7 @@ public interface IWalletAppService
 
     // Event Integrity — Kiểm tra hash chain có bị giả mạo không
     Task<object> VerifyEventIntegrityAsync(Guid walletId);
+
+    // Replay & Self-Healing — Tái dựng balance từ events, so sánh, tự sửa nếu sai
+    Task<object> ReplayAndHealAsync(Guid walletId);
 }

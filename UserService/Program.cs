@@ -41,6 +41,9 @@ builder.Services.AddMassTransit(x =>
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IUserService, UserAppService>();
 
+// Outbox Pattern — Background job gửi message từ DB lên RabbitMQ
+builder.Services.AddHostedService<OutboxProcessor>();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

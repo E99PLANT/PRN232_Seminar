@@ -175,4 +175,21 @@ public class KhanhWalletController : ControllerBase
         var result = await _appService.VerifyEventIntegrityAsync(walletId);
         return Ok(result);
     }
+
+    /// <summary>
+    /// REPLAY & SELF-HEALING — Tái dựng balance từ events, phát hiện hack, tự sửa
+    /// </summary>
+    [HttpPost("replay/{walletId}")]
+    public async Task<IActionResult> ReplayAndHeal(Guid walletId)
+    {
+        try
+        {
+            var result = await _appService.ReplayAndHealAsync(walletId);
+            return Ok(result);
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(new { Message = ex.Message });
+        }
+    }
 }

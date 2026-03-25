@@ -2,7 +2,6 @@
 using System.Text.Json;
 using BalanceService.Application.Handlers;
 using BalanceService.Domain.Events;
-using BalanceService.Infrastructure.Data;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 
@@ -31,7 +30,6 @@ namespace BalanceService.Infrastructure.Messaging
                 if (@event != null)
                 {
                     using var scope = _serviceProvider.CreateScope();
-                    var dbContext = scope.ServiceProvider.GetRequiredService<BalanceDbContext>();
 
                     // Handle transaction events
                     var balanceHandler = scope.ServiceProvider.GetRequiredService<IBalanceHandler>();

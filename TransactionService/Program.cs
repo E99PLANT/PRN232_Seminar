@@ -73,7 +73,10 @@ builder.Services.AddMarten(options =>
     options.Events.DatabaseSchemaName = "transaction_service";
 
     // Đăng ký Projection nhưng cấu hình chạy ASYNC
-    options.Projections.Add<TransactionToRabbitMqProjection>(ProjectionLifecycle.Async);
+    options.Projections.Add(
+               builder.Services.BuildServiceProvider().GetRequiredService<TransactionToRabbitMqProjection>(),
+               ProjectionLifecycle.Async
+           );
 })
 .UseLightweightSessions()
 .AddAsyncDaemon(DaemonMode.HotCold); // Kích hoạt trình chạy ngầm

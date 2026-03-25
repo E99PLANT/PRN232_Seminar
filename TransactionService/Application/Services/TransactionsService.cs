@@ -41,10 +41,6 @@ namespace TransactionService.Application.Services
             // 1.1 Cập nhập entity
             entity.Status = "Completed";
             _transactionRepo.Update(entity);
-
-
-            // 2. Đẩy lên Bus (Dòng sự kiện động - RabbitMQ)
-            //await _eventBus.PublishAsync(@event);
         }
 
         public List<TransactionDetails> GetAllTransactions()

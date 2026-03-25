@@ -8,19 +8,9 @@ using TransactionService.Domain.Events;
 
 namespace TransactionService.Application.Projectors
 {
-    public class TransactionToRabbitMqProjection : EventProjection
+    public class TransactionToRabbitMqProjection(IServiceProvider serviceProvider) : EventProjection
     {
-        private readonly IServiceProvider _serviceProvider;
-
-        public TransactionToRabbitMqProjection(IServiceProvider serviceProvider)
-        {
-            _serviceProvider = serviceProvider;
-        }
-
-        public TransactionToRabbitMqProjection()
-        {
-
-        }
+        private readonly IServiceProvider _serviceProvider = serviceProvider;
 
         // Đổi tên từ Handle thành Project để Marten 7.x tự nhận diện
         public async Task Project(TransactionApproved @event, IDocumentOperations operations)
